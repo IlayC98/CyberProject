@@ -1,7 +1,22 @@
 import socket
+from vidstream import StreamingServer
+import threading
 
 HOST = '127.0.0.1'
 PORT = 4444
+
+
+def receive_screen(HOST,PORT):
+    print(f'got in')
+    receiver= StreamingServer(HOST, PORT)
+    print(f'start receive')
+    t=threading.Thread(target=receiver.start_server)
+    t.start()
+    print("threading")
+    while input("") !='STOP':
+        continue
+    print("hello")
+    receiver.stop_server()
 
 
 def login():
@@ -26,12 +41,13 @@ def login_check(client_socket, data):
 def auth_encrypt(client_socket):
     message = input("Enter the code (or 'exit' to quit): ")
 
-    if message.lower() == 'exit':
+    if message.lower() == 'exit' or not message:
         return 'exit'
 
     # Send the message to the server
     client_socket.send(message.encode('utf-8'))
     server_code_message = client_socket.recv(1024).decode('utf-8')
+    print(f'the server sent {server_code_message}')
     return server_code_message
 
 
@@ -64,9 +80,9 @@ def connect_server():
                     flag = False
                     break
                 elif totp_code != "bad":
-                    while True:
-                        print("waiting for control")
-                        break
+                    print("waiting for control")
+                    receive_screen(HOST,PORT)
+                    print("receiving screen")
                 else:
                     print('Incorrect number, closing connection')
                     flag=False
