@@ -3,32 +3,27 @@ import DBhandle
 import HashMD5 as md
 import TOTPencrypt as tp
 import threading
-from vidstream import ScreenShareClient
+from vidstream import StreamingServer
 import time
 
 HOST = '127.0.0.1'
-PORT = 4444
+PORT = 44444
 
 def share_screen(HOST, PORT):
     print(f'got in')
-    server = ScreenShareClient(HOST,PORT)
-    print(f'start sharing')
+    host = StreamingServer('127.0.0.1', 4444)
+    host.start_server()
 
-    # t = threading.Thread(target=server.start_stream)
-    # t.start()
-    # t.join()  # Wait for the thread to finish
-    server.start_stream()
-    print('threading')
-
-    while input("")!='STOP':
+    while input("") != 'STOP':
         continue
+
+    host.stop_server()
 
     print("HELLO")
 
     # Other Code
 
     # When You Are Done
-    server.stop_stream()
 
 
 def login(data):
@@ -68,6 +63,7 @@ def handle_client(client_socket, client_address):
                         print('good code by client')
                         share_screen(HOST,PORT)
                         print("sharing screen")
+                        flag=False
                     else:
                         print('bad code by client, close connection')
                         client_socket.send("bad".encode())

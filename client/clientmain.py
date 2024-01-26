@@ -1,23 +1,16 @@
 import socket
-from vidstream import StreamingServer
+from vidstream import ScreenShareClient
 import threading
 
 HOST = '127.0.0.1'
-PORT = 4444
+PORT = 44444
 
 
 def receive_screen(HOST,PORT):
     print(f'got in')
-    receiver= StreamingServer(HOST, PORT)
-    print(f'start receive')
-    # t=threading.Thread(target=receiver.start_server)
-    # t.start()
-    receiver.start_server()
-    print("threading")
-    while True:
-        continue
-    print("hello")
-    receiver.stop_server()
+    sender = ScreenShareClient('127.0.0.1', 4444)
+
+    sender.start_stream()
 
 
 def login():
@@ -86,6 +79,9 @@ def connect_server():
                         #client_socket.send('message'.encode('utf-8'))
                         receive_screen(HOST,PORT)
                         print("receiving screen")
+                        while input("")!='STOP':
+                            continue
+                        flag=False
                     else:
                         print('Incorrect number, closing connection')
                         flag=False
