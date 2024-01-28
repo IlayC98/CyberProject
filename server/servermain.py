@@ -7,11 +7,11 @@ from vidstream import StreamingServer
 import time
 
 HOST = '127.0.0.1'
-PORT = 44444
+PORT = 4444
 
 def share_screen(HOST, PORT):
     print(f'got in')
-    host = StreamingServer('127.0.0.1', 4444)
+    host = StreamingServer(HOST, PORT-1)
     host.start_server()
 
     while input("") != 'STOP':
@@ -71,13 +71,11 @@ def handle_client(client_socket, client_address):
             # if not correct username or password it returns to the start and get again username, password from client
             else:
                 client_socket.send("bad".encode())
-        # if client wrote exit or no data it will close the connection with him and the server
-        print(f"Connection from {client_address} closed.")
-        client_socket.close()
     except Exception as e:
         print(f"Error handling client: {e}")
 
     finally:
+        # if client wrote exit or no data it will close the connection with him and the server
         print(f"Connection from {client_address} closed.")
         client_socket.close()
 

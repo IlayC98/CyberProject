@@ -3,12 +3,12 @@ from vidstream import ScreenShareClient
 import threading
 
 HOST = '127.0.0.1'
-PORT = 44444
+PORT = 4444
 
 
 def receive_screen(HOST,PORT):
     print(f'got in')
-    sender = ScreenShareClient('127.0.0.1', 4444)
+    sender = ScreenShareClient(HOST, PORT-1)
 
     sender.start_stream()
 
@@ -57,6 +57,7 @@ def connect_server():
 
         while True:
             if not flag:
+                print('close flag=false ')
                 break
             details = login()
             # check if server logged client in or not
@@ -76,7 +77,6 @@ def connect_server():
                         break
                     elif totp_code != "bad":
                         print("waiting for control")
-                        #client_socket.send('message'.encode('utf-8'))
                         receive_screen(HOST,PORT)
                         print("receiving screen")
                         while input("")!='STOP':
@@ -89,12 +89,12 @@ def connect_server():
             else:
                 print('Incorrect username or password, please try again')
 
-        # Close the connection
-        client_socket.close()
     except Exception as e:
         print(f"Error connecting to the server: {e}")
 
     finally:
+        # Close the connection
+        print('Closing connection')
         client_socket.close()
 
 
