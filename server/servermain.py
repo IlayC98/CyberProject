@@ -5,17 +5,22 @@ import TOTPencrypt as tp
 import threading
 from vidstream import StreamingServer
 import time
+import pyautogui
 
 HOST = '127.0.0.1'
 PORT = 4444
 
-def share_screen(HOST, PORT):
+def share_screen(HOST, PORT, client_socket, client_address):
     print(f'got in')
     host = StreamingServer(HOST, PORT-1)
     host.start_server()
 
-    while input("") != 'STOP':
-        continue
+    while True:
+        currentMouseX, currentMouseY = pyautogui.position()  # Get the XY position of the mouse.
+        print(currentMouseX, currentMouseY)
+        client_socket.send(f'{currentMouseX},{currentMouseY}'.encode())
+        res= client_socket.recv(1024).decode()
+        print(res)
 
     host.stop_server()
 
@@ -32,6 +37,7 @@ def login(data):
 
 def handle_client(client_socket, client_address):
     print(f"Accepted connection from {client_address}")
+    pyautogui.moveTo(100, 150)
     try:
         flag=True
         while True:
@@ -61,14 +67,14 @@ def handle_client(client_socket, client_address):
                         client_socket.send("best".encode())
                         time.sleep(2)
                         print('good code by client')
-                        share_screen(HOST,PORT)
+                        share_screen(HOST,PORT, client_socket, client_address)
                         print("sharing screen")
                         flag=False
                     else:
                         print('bad code by client, close connection')
                         client_socket.send("bad".encode())
                         flag=False
-            # if not correct username or password it returns to the start and get again username, password from client
+            # if not correct username or password it returns to thestart and get again username, password from client
             else:
                 client_socket.send("bad".encode())
     except Exception as e:
@@ -94,4 +100,3 @@ def start_server():
 
 if __name__ == "__main__":
     start_server()
-

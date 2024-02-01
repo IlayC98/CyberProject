@@ -1,16 +1,29 @@
 import socket
 from vidstream import ScreenShareClient
 import threading
+import pyautogui
 
-HOST = '127.0.0.1'
+HOST = ('127.0.0.1')
 PORT = 4444
 
 
-def receive_screen(HOST,PORT):
+def receive_screen(HOST,PORT, client_socket):
     print(f'got in')
     sender = ScreenShareClient(HOST, PORT-1)
 
     sender.start_stream()
+    print("receiving screen")
+    while True:
+        client_socket.send("first".encode())
+
+        xy1=client_socket.recv(1024).decode()
+        print(xy1)
+        xy=xy1.split(",")
+        x,y=xy[0],xy[1]
+        print(x,y)
+        pyautogui.moveTo(int(x), int(y))
+        # client_socket.send("second".encode())
+    sender.stop_stream()
 
 
 def login():
@@ -52,6 +65,8 @@ def connect_server():
     try:
         # Connect to the server
         client_socket.connect(server_address)
+        print("connected")
+        pyautogui.moveTo(100, 150)
 
         flag = True
 
@@ -77,11 +92,8 @@ def connect_server():
                         break
                     elif totp_code != "bad":
                         print("waiting for control")
-                        receive_screen(HOST,PORT)
-                        print("receiving screen")
-                        while input("")!='STOP':
-                            continue
-                        flag=False
+                        receive_screen(HOST,PORT,client_socket)
+                        flag = False
                     else:
                         print('Incorrect number, closing connection')
                         flag=False
