@@ -90,6 +90,7 @@ def login(username, password):
 
     return user
 
+
 if __name__ == "__main__":
     createDB()
     add_user("i", "l", "il@example.com", 1)
