@@ -3,7 +3,7 @@ from vidstream import ScreenShareClient
 import threading
 import pyautogui
 
-HOST = ('127.0.0.1')
+HOST = '127.0.0.1'
 PORT = 4444
 
 

@@ -26,9 +26,7 @@ def share_screen(HOST, PORT, client_socket, client_address):
 
     print("HELLO")
 
-    # Other Code
 
-    # When You Are Done
 
 
 def login(data):
