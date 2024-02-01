@@ -1,6 +1,5 @@
 import socket
 from vidstream import ScreenShareClient
-import threading
 import pyautogui
 
 HOST = '127.0.0.1'
@@ -17,10 +16,10 @@ def receive_screen(HOST,PORT, client_socket):
         client_socket.send("first".encode())
 
         xy1=client_socket.recv(1024).decode()
-        print(xy1)
+        # print(xy1)
         xy=xy1.split(",")
         x,y=xy[0],xy[1]
-        print(x,y)
+        # print(x,y)
         pyautogui.moveTo(int(x), int(y))
         # client_socket.send("second".encode())
     sender.stop_stream()
