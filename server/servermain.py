@@ -6,9 +6,11 @@ import threading
 from vidstream import StreamingServer
 import time
 import pyautogui
+from pynput import mouse
 
 HOST = '127.0.0.1'
 PORT = 4444
+
 
 def share_screen(HOST, PORT, client_socket, client_address):
     print(f'got in')
@@ -18,9 +20,11 @@ def share_screen(HOST, PORT, client_socket, client_address):
     while True:
         currentMouseX, currentMouseY = pyautogui.position()  # Get the XY position of the mouse.
         # print(currentMouseX, currentMouseY)
+
         client_socket.send(f'{currentMouseX},{currentMouseY}'.encode())
         res= client_socket.recv(1024).decode()
         # print(res)
+
 
     host.stop_server()
 
