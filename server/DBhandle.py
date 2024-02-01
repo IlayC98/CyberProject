@@ -28,6 +28,7 @@ def createDB():
                        ("David", md.hash_pass("Lenovo"), "david@example.com", 1))
         cursor.execute("INSERT INTO users (username, password, email, is_connected) VALUES (?, ?, ?, ?)",
                        ("Moshe", md.hash_pass("Asus"), "moshe@example.com", 0))
+
     conn.commit()
     conn.close()
 
@@ -47,6 +48,34 @@ def showDB():
     conn.commit()
     conn.close()
 
+def username_exists(username):
+    # Check if the username already exists in the database
+    conn = sqlite3.connect("user_database.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) FROM users WHERE username=?", (username,))
+    result = cursor.fetchone()[0]
+    conn.close()
+    return result > 0
+
+def add_user(username, password, email, is_connected):
+    # Check if the username already exists
+    if username_exists(username):
+        print(f"Error: Username '{username}' already exists.")
+        return
+
+    # Connect to the database
+    conn = sqlite3.connect("user_database.db")
+    cursor = conn.cursor()
+
+    # Insert a new user into the users table
+    cursor.execute("INSERT INTO users (username, password, email, is_connected) VALUES (?, ?, ?, ?)",
+                   (username, md.hash_pass(password), email, is_connected))
+
+    # Commit changes and close the connection
+    conn.commit()
+    conn.close()
+
+
 def login(username, password):
     # Connect to the database
     conn = sqlite3.connect("user_database.db")
@@ -63,4 +92,5 @@ def login(username, password):
 
 if __name__ == "__main__":
     createDB()
+    add_user("i", "l", "il@example.com", 1)
     showDB()
