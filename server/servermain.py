@@ -6,9 +6,9 @@ import threading
 from vidstream import StreamingServer
 import time
 import pyautogui
-from pynput import mouse
+import win32api
 
-HOST = '127.0.0.1'
+HOST = '10.100.102.32'
 PORT = 4444
 
 
@@ -17,19 +17,46 @@ def share_screen(HOST, PORT, client_socket, client_address):
     host = StreamingServer(HOST, PORT-1)
     host.start_server()
 
-    while True:
-        currentMouseX, currentMouseY = pyautogui.position()  # Get the XY position of the mouse.
-        # print(currentMouseX, currentMouseY)
+    state_left = win32api.GetKeyState(0x01)  # Left button down = 0 or 1. Button up = -127 or -128
+    state_right = win32api.GetKeyState(0x02)  # Right button down = 0 or 1. Button up = -127 or -128
 
-        client_socket.send(f'{currentMouseX},{currentMouseY}'.encode())
-        res= client_socket.recv(1024).decode()
-        # print(res)
+    while True:
+        try:
+            currentMouseX, currentMouseY = pyautogui.position()
+            a = win32api.GetKeyState(0x01)
+            b = win32api.GetKeyState(0x02)
+            left_button_pressed = False
+            if a != state_left:  # Button state changed
+                state_left = a
+                print(a)
+                if a < 0:
+                    print('Left Button Pressed')
+                    left_button_pressed = True
+                else:
+                    print('Left Button Released')
+                    left_button_pressed = False
+
+
+            # Check if the left mouse button is pressed
+            if left_button_pressed:
+                print("on click")
+                # Send message with additional information when the left button is pressed
+                client_socket.send(f'{currentMouseX},{currentMouseY},1'.encode())
+                print("sent True")
+            else:
+                client_socket.send(f'{currentMouseX},{currentMouseY},0'.encode())
+                # print("sent False")
+
+            res = client_socket.recv(1024).decode()
+            # print(res)
+
+        except Exception as e:
+            print(f"Error in share_screen: {e}")
+            break
 
 
     host.stop_server()
-
-    print("HELLO")
-
+    print("Screen sharing stopped")
 
 def login(data):
     username, password = data.decode('utf-8').split(':')

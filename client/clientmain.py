@@ -1,8 +1,9 @@
 import socket
 from vidstream import ScreenShareClient
+from pynput.mouse import Button,Controller
 import pyautogui
 
-HOST = '127.0.0.1'
+HOST = '10.100.102.32'
 PORT = 4444
 
 
@@ -18,9 +19,13 @@ def receive_screen(HOST,PORT, client_socket):
         xy1=client_socket.recv(1024).decode()
         # print(xy1)
         xy=xy1.split(",")
-        x,y=xy[0],xy[1]
+        x,y=int(xy[0]),int(xy[1])
+        pressed=int(str(xy[2]))
         # print(x,y)
-        pyautogui.moveTo(int(x), int(y))
+        pyautogui.moveTo(x,y)
+        if bool(pressed):
+            print("got pressed")
+        #     pyautogui.click(x,y)
         # client_socket.send("second".encode())
     sender.stop_stream()
 
@@ -65,7 +70,7 @@ def connect_server():
         # Connect to the server
         client_socket.connect(server_address)
         print("connected")
-        pyautogui.moveTo(100, 150)
+        # pyautogui.moveTo(100, 150)
 
         flag = True
 
