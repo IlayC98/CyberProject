@@ -7,13 +7,29 @@ from vidstream import StreamingServer
 import time
 import pyautogui
 import win32api
+from screeninfo import get_monitors
 
-HOST = '10.100.102.32'
+HOST = '172.20.157.38'
 PORT = 4444
+
+
+def get_your_screen_resolution():
+    # Get the screen resolution of the primary monitor
+    monitors = get_monitors()
+
+    if monitors:
+        primary_monitor = monitors[0]
+        width = primary_monitor.width
+        height = primary_monitor.height
+        return width, height
+    else:
+        # Default values if no monitors are found
+        return 1920, 1080  # Update with your default values
 
 
 def share_screen(HOST, PORT, client_socket, client_address):
     print(f'got in')
+    client_socket.send(f'{get_your_screen_resolution()[0]},{get_your_screen_resolution()[1]},1'.encode())
     host = StreamingServer(HOST, PORT-1)
     host.start_server()
 
