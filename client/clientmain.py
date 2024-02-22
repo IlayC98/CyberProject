@@ -2,21 +2,39 @@ import socket
 from vidstream import ScreenShareClient
 from pynput.mouse import Button,Controller
 import pyautogui
+from screeninfo import get_monitors
 
 HOST = '172.20.157.38'
 PORT = 4444
 pyautogui.FAILSAFE=False
 
 
+def get_your_screen_resolution():
+    # Get the screen resolution of the primary monitor
+    monitors = get_monitors()
+
+    if monitors:
+        primary_monitor = monitors[0]
+        width = primary_monitor.width
+        height = primary_monitor.height
+        return width, height
+    else:
+        # Default values if no monitors are found
+        return 1920, 1080  # Update with your default values
+
 def receive_screen(HOST,PORT, client_socket):
     print(f'got in')
     data= client_socket.recv(1024).decode().split(",")
     print(data)
-    width, height=int(data[0]), int(data[1])
-    sender = ScreenShareClient(HOST, PORT-1, width,height)
+    width_server, height_server=int(data[0]), int(data[1])
+    sender = ScreenShareClient(HOST, PORT-1, width_server,height_server)
 
     sender.start_stream()
     print("receiving screen")
+
+
+    width, height=get_your_screen_resolution()[0],get_your_screen_resolution()[1]
+    client_socket.send(f'{width},{height},1'.encode())
     while True:
         client_socket.send("first".encode())
 

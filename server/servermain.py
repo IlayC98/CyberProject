@@ -29,10 +29,14 @@ def get_your_screen_resolution():
 
 def share_screen(HOST, PORT, client_socket, client_address):
     print(f'got in')
-    print(f'{get_your_screen_resolution()[0]},{get_your_screen_resolution()[1]}')
-    client_socket.send(f'{get_your_screen_resolution()[0]},{get_your_screen_resolution()[1]},1'.encode())
+    width, height=get_your_screen_resolution()[0],get_your_screen_resolution()[1]
+    client_socket.send(f'{width},{height},1'.encode())
     host = StreamingServer(HOST, PORT-1)
     host.start_server()
+
+    data = client_socket.recv(1024).decode().split(",")
+    width_client, height_client = int(data[0]), int(data[1])
+    diff_width, diff_height =abs(width-width_client), abs(height-height_client)
 
     state_left = win32api.GetKeyState(0x01)  # Left button down = 0 or 1. Button up = -127 or -128
     state_right = win32api.GetKeyState(0x02)  # Right button down = 0 or 1. Button up = -127 or -128
@@ -58,10 +62,10 @@ def share_screen(HOST, PORT, client_socket, client_address):
             if left_button_pressed:
                 print("on click")
                 # Send message with additional information when the left button is pressed
-                client_socket.send(f'{currentMouseX},{currentMouseY},1'.encode())
+                client_socket.send(f'{currentMouseX-diff_width},{currentMouseY-diff_height},1'.encode())
                 print("sent True")
             else:
-                client_socket.send(f'{currentMouseX},{currentMouseY},0'.encode())
+                client_socket.send(f'{currentMouseX-diff_width},{currentMouseY-diff_height},0'.encode())
                 # print("sent False")
 
             res = client_socket.recv(1024).decode()
