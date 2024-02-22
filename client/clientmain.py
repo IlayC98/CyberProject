@@ -11,7 +11,7 @@ def receive_screen(HOST,PORT, client_socket):
     print(f'got in')
     data= client_socket.recv(1024).split(",")
     width, height=data[0], data[1]
-    sender = ScreenShareClient(HOST, PORT-1)
+    sender = ScreenShareClient(HOST, PORT-1, width,height)
 
     sender.start_stream()
     print("receiving screen")
