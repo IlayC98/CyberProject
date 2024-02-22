@@ -3,13 +3,14 @@ from vidstream import ScreenShareClient
 from pynput.mouse import Button,Controller
 import pyautogui
 
-HOST = '10.100.102.32'
+HOST = '172.20.157.38'
 PORT = 4444
 
 
 def receive_screen(HOST,PORT, client_socket):
     print(f'got in')
     data= client_socket.recv(1024).decode().split(",")
+    print(data)
     width, height=data[0], data[1]
     sender = ScreenShareClient(HOST, PORT-1, width,height)
 

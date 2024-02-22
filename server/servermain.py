@@ -29,6 +29,7 @@ def get_your_screen_resolution():
 
 def share_screen(HOST, PORT, client_socket, client_address):
     print(f'got in')
+    print(f'{get_your_screen_resolution()[0]},{get_your_screen_resolution()[1]}')
     client_socket.send(f'{get_your_screen_resolution()[0]},{get_your_screen_resolution()[1]},1'.encode())
     host = StreamingServer(HOST, PORT-1)
     host.start_server()
@@ -80,7 +81,7 @@ def login(data):
 
 def handle_client(client_socket, client_address):
     print(f"Accepted connection from {client_address}")
-    pyautogui.moveTo(100, 150)
+    # pyautogui.moveTo(100, 150)
     try:
         flag=True
         while True:
