@@ -5,6 +5,7 @@ import pyautogui
 
 HOST = '172.20.157.38'
 PORT = 4444
+pyautogui.FAILSAFE=False
 
 
 def receive_screen(HOST,PORT, client_socket):
