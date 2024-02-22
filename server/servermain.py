@@ -38,14 +38,6 @@ def share_screen(HOST, PORT, client_socket, client_address):
     width_client, height_client = int(data[0]), int(data[1])
     print(width_client,height_client)
     print(width,height)
-    diff_width, diff_height =abs(width-width_client), abs(height-height_client)
-    screen_width_bigger = True
-    screen_height_bigger = True
-    if diff_width!=width-width_client: screen_width_bigger= False
-    if diff_height!=height-height_client: screen_height_bigger= False
-    print("diff:", diff_width,diff_height)
-    print("screen_width_bigger:", screen_width_bigger)
-    print("screen_height_bigger:", screen_height_bigger)
     ratio_width=width_client/width
     ratio_height=height_client/height
 
@@ -69,17 +61,8 @@ def share_screen(HOST, PORT, client_socket, client_address):
                     print('Left Button Released')
                     left_button_pressed = False
 
-            # if screen_width_bigger: mouse_x=currentMouseX-diff_width
-            # elif not screen_width_bigger: mouse_x=currentMouseX-diff_width
-            #
-            # if screen_height_bigger: mouse_y=currentMouseY-diff_height
-            # elif not screen_height_bigger: mouse_y=currentMouseY-diff_height
-
             mouse_x=int(currentMouseX*ratio_width)
             mouse_y=int(currentMouseY*ratio_height)-20
-
-            # if mouse_x<0: mouse_x=currentMouseX
-            # if mouse_y<0: mouse_y=currentMouseY
 
             print("mouse on client:", mouse_x, mouse_y)
             # Check if the left mouse button is pressed
