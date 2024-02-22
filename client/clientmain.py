@@ -32,12 +32,10 @@ def receive_screen(HOST,PORT, client_socket):
     sender.start_stream()
     print("receiving screen")
 
-
     width, height=get_your_screen_resolution()[0],get_your_screen_resolution()[1]
     client_socket.send(f'{width},{height},1'.encode())
-    while True:
-        client_socket.send("first".encode())
 
+    while True:
         xy1=client_socket.recv(1024).decode()
         # print(xy1)
         xy=xy1.split(",")
