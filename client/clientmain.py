@@ -46,7 +46,7 @@ def receive_screen(HOST,PORT, client_socket):
         if bool(pressed):
             print("got pressed")
         #     pyautogui.click(x,y)
-        # client_socket.send("second".encode())
+        client_socket.send("second".encode())
     sender.stop_stream()
 
 

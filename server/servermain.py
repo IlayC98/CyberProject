@@ -47,7 +47,7 @@ def share_screen(HOST, PORT, client_socket, client_address):
     while True:
         try:
             currentMouseX, currentMouseY = pyautogui.position()
-            print("current mouse:",currentMouseX,currentMouseY)
+            # print("current mouse:",currentMouseX,currentMouseY)
             a = win32api.GetKeyState(0x01)
             b = win32api.GetKeyState(0x02)
             left_button_pressed = False
@@ -64,7 +64,7 @@ def share_screen(HOST, PORT, client_socket, client_address):
             mouse_x=int(currentMouseX*ratio_width)
             mouse_y=int(currentMouseY*ratio_height)-20
 
-            print("mouse on client:", mouse_x, mouse_y)
+            # print("mouse on client:", mouse_x, mouse_y)
             # Check if the left mouse button is pressed
             if left_button_pressed:
                 print("on click")
