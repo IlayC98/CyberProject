@@ -9,6 +9,15 @@ import serverControl
 HOST = '10.100.102.32'
 PORT = 4444
 
+users_list=[]
+
+def add_user(users_list, client_socket, client_address):
+    users_list.append((client_socket, client_address))
+def check_user_can_controlled(users_list, client_socket, client_address):
+    if users_list[0]== (client_socket, client_address): return True
+    return False
+def remove_user(users_list, client_socket, client_address):
+    users_list.remove((client_socket, client_address))
 
 def login(data):
     username, password = data.decode('utf-8').split(':')
@@ -46,6 +55,11 @@ def handle_client(client_socket, client_address):
                         client_socket.send("best".encode())
                         time.sleep(2)
                         print('good code by client')
+                        add_user(users_list, client_socket, client_address)
+                        while not check_user_can_controlled(users_list, client_socket, client_address):
+                            client_socket.send("can't be controlled now, the server handles another client".encode())
+                            client_socket.recv().decode()
+                        client_socket.send("now can join".encode())
                         serverControl.share_screen(HOST,PORT, client_socket, client_address)
                         print("sharing screen")
                         flag=False
@@ -63,6 +77,7 @@ def handle_client(client_socket, client_address):
         # if client wrote exit or no data it will close the connection with him and the server
         print(f"Connection from {client_address} closed.")
         client_socket.close()
+        remove_user(users_list, client_socket, client_address)
 
 def start_server():
     # Create a server socket

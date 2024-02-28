@@ -116,6 +116,7 @@ def connect_server():
                         break
                     elif totp_code != "bad":
                         print("waiting for control")
+                        while client_socket.recv().decode('utf8') != 'now can join': client_socket.send("ok".encode())
                         receive_screen(HOST,PORT,client_socket)
                         flag = False
                     else:
