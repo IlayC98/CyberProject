@@ -4,7 +4,7 @@ from pynput.mouse import Button,Controller
 import pyautogui
 from screeninfo import get_monitors
 
-HOST = '172.20.157.38'
+HOST = '10.100.102.32'
 PORT = 4444
 pyautogui.FAILSAFE=False
 
