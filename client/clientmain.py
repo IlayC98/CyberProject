@@ -3,6 +3,7 @@ from vidstream import ScreenShareClient
 from pynput.mouse import Button,Controller
 import pyautogui
 from screeninfo import get_monitors
+import time
 
 HOST = '10.100.102.32'
 PORT = 4444
@@ -34,6 +35,8 @@ def receive_screen(HOST,PORT, client_socket):
 
     width, height=get_your_screen_resolution()[0],get_your_screen_resolution()[1]
     client_socket.send(f'{width},{height},1'.encode())
+
+    time.sleep(5)
 
     while True:
         xy1=client_socket.recv(1024).decode()

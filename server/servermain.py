@@ -9,6 +9,7 @@ import serverControl
 HOST = '10.100.102.32'
 PORT = 4444
 
+
 users_list=[]
 
 def add_user(users_list, client_socket, client_address):
@@ -19,9 +20,11 @@ def check_user_can_controlled(users_list, client_socket, client_address):
 def remove_user(users_list, client_socket, client_address):
     users_list.remove((client_socket, client_address))
 
+
 def login(data):
     username, password = data.decode('utf-8').split(':')
     return DBhandle.login(username, md.hash_pass(password))
+
 
 def handle_client(client_socket, client_address):
     print(f"Accepted connection from {client_address}")
@@ -57,10 +60,9 @@ def handle_client(client_socket, client_address):
                         print('good code by client')
                         add_user(users_list, client_socket, client_address)
                         while not check_user_can_controlled(users_list, client_socket, client_address):
-                            client_socket.send("can't be controlled now, the server handles another client".encode())
-                            client_socket.recv().decode()
-                        client_socket.send("now can join".encode())
-                        serverControl.share_screen(HOST,PORT, client_socket, client_address)
+                            continue
+                        if check_user_can_controlled(users_list, client_socket, client_address):
+                            serverControl.share_screen(HOST,PORT, client_socket, client_address)
                         print("sharing screen")
                         flag=False
                     else:
