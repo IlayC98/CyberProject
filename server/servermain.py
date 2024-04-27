@@ -6,7 +6,7 @@ import threading
 import time
 import serverControl
 
-HOST = '172.20.137.79'
+HOST = "10.100.102.32"
 PORT = 4444
 
 users_list = []

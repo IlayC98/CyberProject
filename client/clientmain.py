@@ -46,9 +46,21 @@ def receive_screen(HOST,PORT, client_socket):
         pressed=int(str(xy[2]))
         # print(x,y)
         pyautogui.moveTo(x,y)
-        if bool(pressed):
-            print("got pressed")
+        if not bool(pressed):
+            pass
+        elif pressed==1:
+            print("got left pressed")
         #     pyautogui.click(x,y)
+        elif pressed==2:
+            print("got right pressed")
+        #     pyautogui.click(x,y, button='right')
+        elif pressed==3:
+            print(xy)
+            key=str(xy[3])
+            print(f"{key} pressed")
+            # pyautogui.press(key)
+            if key=='q':
+                break
         client_socket.send("second".encode())
     sender.stop_stream()
 
@@ -119,8 +131,9 @@ def connect_server():
                         break
                     elif totp_code != "bad":
                         print("waiting for control")
-                        while client_socket.recv().decode('utf8') != 'now can join': client_socket.send("ok".encode())
+                        #while client_socket.recv().decode('utf8') != 'now can join': client_socket.send("ok".encode())
                         receive_screen(HOST,PORT,client_socket)
+                        print("out")
                         flag = False
                     else:
                         print('Incorrect number, closing connection')
