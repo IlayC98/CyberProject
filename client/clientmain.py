@@ -1,9 +1,11 @@
 import socket
 from vidstream import ScreenShareClient
-from pynput.mouse import Button,Controller
+import tkinter as tk
+from tkinter import ttk
 import pyautogui
 from screeninfo import get_monitors
 import time
+import clientGUI as cgui
 
 HOST = '10.100.102.32'
 PORT = 4444
@@ -65,13 +67,6 @@ def receive_screen(HOST,PORT, client_socket):
     sender.stop_stream()
 
 
-def login():
-    username = input('enter username')
-    password = input('enter password')
-    message = f'{username}:{password}'
-    return message
-
-
 def login_check(client_socket, data):
     if data.lower() == 'exit':
         return "exit"
@@ -84,27 +79,24 @@ def login_check(client_socket, data):
     return echoed_message
 
 
-def auth_encrypt(client_socket):
-    message = input("Enter the code (or 'exit' to quit): ")
-
-    if message.lower() == 'exit' or not message:
-        return 'exit'
-
-    # Send the message to the server
-    client_socket.send(message.encode('utf-8'))
-    server_code_message = client_socket.recv(1024).decode('utf-8')
-    print(f'the server sent {server_code_message}')
-    return server_code_message
-
-
 def connect_server():
     # Create a client socket
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_address = (HOST, PORT)
     try:
+        waiting_screen = cgui.show_waiting_screen()
         # Connect to the server
-        client_socket.connect(server_address)
+        while True:
+            try:
+                # Connect to the server
+                client_socket.connect(server_address)
+                print("Connected")
+                break  # Exit the loop if connected successfully
+            except ConnectionRefusedError:
+                continue  # Retry connection if failed
         print("connected")
+        # Close the waiting screen
+        cgui.close_waiting_screen(waiting_screen)
         # pyautogui.moveTo(100, 150)
 
         flag = True
@@ -113,10 +105,11 @@ def connect_server():
             if not flag:
                 print('close flag=false ')
                 break
-            details = login()
-            # check if server logged client in or not
-            check = login_check(client_socket, details)
+            app_details = cgui.login_screen()
+            #check if the server logged in or not
+            check = login_check(client_socket, app_details)
             if check == "exit":
+                cgui.bye()
                 break
             elif check != "bad":
                 print(f"Server echoed: {check}")
@@ -124,7 +117,7 @@ def connect_server():
                     if not flag:
                         break
                     # check if the client code sent was right for the server
-                    totp_code = auth_encrypt(client_socket)
+                    totp_code = cgui.auth_encrypt_screen(client_socket)
                     print('got message')
                     if totp_code == "exit":
                         flag = False
@@ -140,14 +133,15 @@ def connect_server():
                         flag=False
 
             else:
-                print('Incorrect username or password, please try again')
+                cgui.incorrect_details()
 
     except Exception as e:
-        print(f"Error connecting to the server: {e}")
+        error_message = f"Error connecting to the server: {e}"
+        cgui.show_error_message(error_message)
 
     finally:
         # Close the connection
-        print('Closing connection')
+        cgui.show_end_message("Closing connection")
         client_socket.close()
 
 
