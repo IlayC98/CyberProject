@@ -77,7 +77,7 @@ def login_screen():
 
 
 
-def show_waiting_screen():
+def show_waiting_screen(client_socket, server_address):
     root = tk.Tk()
     root.title("Waiting Screen")
     root.geometry("500x300")
@@ -88,6 +88,15 @@ def show_waiting_screen():
     progressbar = ttk.Progressbar(root, mode='indeterminate')
     progressbar.pack(fill='x', padx=20, pady=5)
     progressbar.start(10)
+
+    while True:
+        try:
+            # Connect to the server
+            client_socket.connect(server_address)
+            print("Connected")
+            break  # Exit the loop if connected successfully
+        except ConnectionRefusedError:
+            continue  # Retry connection if failed
 
     root.mainloop()
     return root

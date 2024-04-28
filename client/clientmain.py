@@ -84,16 +84,8 @@ def connect_server():
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_address = (HOST, PORT)
     try:
-        waiting_screen = cgui.show_waiting_screen()
+        waiting_screen = cgui.show_waiting_screen(client_socket, server_address)
         # Connect to the server
-        while True:
-            try:
-                # Connect to the server
-                client_socket.connect(server_address)
-                print("Connected")
-                break  # Exit the loop if connected successfully
-            except ConnectionRefusedError:
-                continue  # Retry connection if failed
         print("connected")
         # Close the waiting screen
         cgui.close_waiting_screen(waiting_screen)
