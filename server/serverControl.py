@@ -106,8 +106,6 @@ def share_screen(HOST, PORT, client_socket, client_address):
                 if keyboard.is_pressed(i):
                     client_socket.send(f'{mouse_x},{mouse_y},3,{i}'.encode())
                     print(f"Sent {i}")
-                    time.sleep(0.2)
-                    # print(f"{i} is pressed")
 
             if left_button_pressed(mouse_keys[0]):
                 print("Left click")
