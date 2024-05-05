@@ -110,7 +110,7 @@ def connect_server():
                     if not flag:
                         break
                     # check if the client code sent was right for the server
-                    totp_code = cgui.auth_encrypt_screen(client_socket)
+                    totp_code = cgui.auth_encrypt_screen(client_socket, check)
                     print('got message')
                     if totp_code == "exit":
                         flag = False

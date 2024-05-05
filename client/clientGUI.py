@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 
 
-def auth_encrypt_screen(client_socket):
+def auth_encrypt_screen(client_socket, message):
     def auth_encrypt():
         message = entry_text.get()
         if message.lower() == 'exit' or not message:
@@ -17,23 +17,26 @@ def auth_encrypt_screen(client_socket):
 
     app = tk.Tk()
     app.title("Authentication")
-    app.geometry("400x200")
+    app.geometry("1100x600")
     app.resizable(False, False)
 
-    label1 = tk.Label(app, text="Enter the code:", font=('Arial Bold', 16))
+    label1 = tk.Label(app, text=message, font=('Arial Bold', 14))
     label1.grid(column=0, row=0)
+
+    label1 = tk.Label(app, text="Enter the code:", font=('Arial Bold', 16))
+    label1.grid(column=0, row=1)
 
     entry_text = tk.StringVar()
     entry = tk.Entry(app, width=20, textvariable=entry_text)
-    entry.grid(column=0, row=1, padx=10, pady=5)
+    entry.grid(column=0, row=2, padx=10, pady=5)
     entry.focus()
 
     response_label = tk.Label(app, text='', font=('Arial', 12))
-    response_label.grid(column=0, row=2, padx=10, pady=5)
+    response_label.grid(column=0, row=3, padx=10, pady=5)
 
     x = auth_encrypt
     appbtn = tk.Button(app, text='continue', command=x)
-    appbtn.grid(column=1, row=5)
+    appbtn.grid(column=0, row=4)
 
     app.mainloop()
 
