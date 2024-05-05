@@ -4,6 +4,7 @@ from screeninfo import get_monitors
 from vidstream import StreamingServer
 import keyboard
 import time
+from pynput import mouse
 
 mouse_keys = [win32api.GetKeyState(0x01), win32api.GetKeyState(0x02)]
 keyboard_keys = (
@@ -85,6 +86,21 @@ def share_screen(HOST, PORT, client_socket, client_address):
             currentMouseX, currentMouseY = pyautogui.position()
             mouse_x = int(currentMouseX * ratio_width)
             mouse_y = int(currentMouseY * ratio_height) - 20
+
+            def on_scroll(x, y, dx, dy):
+                if dy > 0:
+                    print('Mouse scrolled up')
+                    client_socket.send(f'{x},{y},4, up'.encode())
+
+                elif dy < 0:
+                    print('Mouse scrolled down')
+                    client_socket.send(f'{x},{y},4, down'.encode())
+
+            with mouse.Listener(on_scroll=on_scroll) as listener:
+                # Wait for 2 seconds
+                time.sleep(0.2)
+                # Stop the listener after 2 seconds
+                listener.stop()
 
             for i in keyboard_keys:
                 if keyboard.is_pressed(i):

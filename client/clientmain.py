@@ -63,6 +63,16 @@ def receive_screen(HOST,PORT, client_socket):
             # pyautogui.press(key)
             if key=='q':
                 break
+        elif pressed==4:
+            print(xy)
+            key=str(xy[3])
+            print(f"{key} pressed")
+            if key=='up':
+                print("scroll up")
+                # pyautogui.scroll(10)
+            elif key=='down':
+                print("scroll down")
+                # pyautogui.scroll(-10)
         client_socket.send("second".encode())
     sender.stop_stream()
 
