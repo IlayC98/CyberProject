@@ -90,11 +90,11 @@ def share_screen(HOST, PORT, client_socket, client_address):
             def on_scroll(x, y, dx, dy):
                 if dy > 0:
                     print('Mouse scrolled up')
-                    client_socket.send(f'{x},{y},4, up'.encode())
+                    client_socket.send(f'{mouse_x},{mouse_y},4, up'.encode())
 
                 elif dy < 0:
                     print('Mouse scrolled down')
-                    client_socket.send(f'{x},{y},4, down'.encode())
+                    client_socket.send(f'{mouse_x},{mouse_y},4, down'.encode())
 
             with mouse.Listener(on_scroll=on_scroll) as listener:
                 # Wait for 2 seconds
