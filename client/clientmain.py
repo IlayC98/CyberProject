@@ -82,13 +82,14 @@ def login_check(client_socket, data):
 def connect_server():
     # Create a client socket
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    print("1")
     server_address = (HOST, PORT)
+    print("2")
     try:
-        waiting_screen = cgui.show_waiting_screen(client_socket, server_address)
+        # waiting_screen = cgui.show_waiting_screen(client_socket, server_address)
+        client_socket.connect(server_address)
         # Connect to the server
         print("connected")
-        # Close the waiting screen
-        cgui.close_waiting_screen(waiting_screen)
         # pyautogui.moveTo(100, 150)
 
         flag = True

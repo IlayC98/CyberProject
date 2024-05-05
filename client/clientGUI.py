@@ -11,7 +11,7 @@ def auth_encrypt_screen(client_socket):
         # Send the message to the server
         client_socket.send(message.encode('utf-8'))
         server_code_message = client_socket.recv(1024).decode('utf-8')
-        print(f'The server sent: {server_code_message}')
+        response_label.config(text=f'The server sent: {server_code_message}')
         app.destroy()  # Destroy the window after login
         return server_code_message
 
@@ -28,13 +28,17 @@ def auth_encrypt_screen(client_socket):
     entry.grid(column=0, row=1, padx=10, pady=5)
     entry.focus()
 
-    appbtn = tk.Button(app, text='continue', command=auth_encrypt)
+    response_label = tk.Label(app, text='', font=('Arial', 12))
+    response_label.grid(column=0, row=2, padx=10, pady=5)
+
+    x = auth_encrypt
+    appbtn = tk.Button(app, text='continue', command=x)
     appbtn.grid(column=1, row=5)
 
     app.mainloop()
 
     # This line is executed after the mainloop exits
-    return auth_encrypt()
+    return x
 
 
 def login_screen():
@@ -72,37 +76,41 @@ def login_screen():
 
     app.mainloop()
 
+    username, password = entry_text_user.get(), entry_text_pass.get()
+    message = f'{username}:{password}'
+
     # This line is executed after the mainloop exits
-    return login()  # Return the username and password
+    return message  # Return the username and password
 
 
 
-def show_waiting_screen(client_socket, server_address):
-    root = tk.Tk()
-    root.title("Waiting Screen")
-    root.geometry("500x300")
-
-    label = tk.Label(root, text="Connecting to server...")
-    label.pack(pady=10)
-
-    progressbar = ttk.Progressbar(root, mode='indeterminate')
-    progressbar.pack(fill='x', padx=20, pady=5)
-    progressbar.start(10)
-
-    while True:
-        try:
-            # Connect to the server
-            client_socket.connect(server_address)
-            print("Connected")
-            break  # Exit the loop if connected successfully
-        except ConnectionRefusedError:
-            continue  # Retry connection if failed
-
-    root.mainloop()
-    return root
-
-def close_waiting_screen(root):
-    root.destroy()
+# def show_waiting_screen(client_socket, server_address):
+#     print("f")
+#     root = tk.Tk()
+#     root.title("Waiting Screen")
+#     root.geometry("500x300")
+#
+#     label = tk.Label(root, text="Connecting to server...")
+#     label.pack(pady=10)
+#
+#     progressbar = ttk.Progressbar(root, mode='indeterminate')
+#     progressbar.pack(fill='x', padx=20, pady=5)
+#     progressbar.start(10)
+#
+#     try:
+#         # Connect to the server
+#         print(bool(client_socket.connect(server_address)))
+#         print("Connected")
+#         root.destroy()
+#
+#     except ConnectionRefusedError:
+#         print("hi")  # Retry connection if failed
+#
+#     root.mainloop()
+#     return root
+#
+# def close_waiting_screen(root):
+#     root.destroy()
 
 
 def bye():
