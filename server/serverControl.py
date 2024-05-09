@@ -5,6 +5,8 @@ from vidstream import StreamingServer
 import keyboard
 import time
 from pynput import mouse
+import ctypes
+
 
 mouse_keys = [win32api.GetKeyState(0x01), win32api.GetKeyState(0x02)]
 keyboard_keys = (
@@ -54,6 +56,29 @@ def right_button_pressed(state_right):
 
     return right_button_got_pressed
 
+def get_taskbar_height():
+    # Define the RECT structure
+    class RECT(ctypes.Structure):
+        _fields_ = [
+            ("left", ctypes.c_long),
+            ("top", ctypes.c_long),
+            ("right", ctypes.c_long),
+            ("bottom", ctypes.c_long)
+        ]
+
+    # Get the handle to the taskbar window
+    hwnd = ctypes.windll.user32.FindWindowW("Shell_TrayWnd", None)
+
+    # Get the dimensions of the taskbar window
+    rect = RECT()
+    ctypes.windll.user32.GetWindowRect(hwnd, ctypes.byref(rect))
+
+    # Calculate the height of the taskbar
+    taskbar_height = rect.bottom - rect.top
+
+    return taskbar_height
+
+
 def get_your_screen_resolution():
     monitors = get_monitors()
 
@@ -68,7 +93,8 @@ def get_your_screen_resolution():
 def share_screen(HOST, PORT, client_socket, client_address):
     print(f'Got in')
     width, height = get_your_screen_resolution()
-    client_socket.send(f'{width},{height},1'.encode())
+    taskbar_height = get_taskbar_height()
+    client_socket.send(f'{width},{height-taskbar_height},1'.encode())
 
     host = StreamingServer(HOST, PORT-1)
     host.start_server()

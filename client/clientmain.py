@@ -7,10 +7,34 @@ from screeninfo import get_monitors
 import time
 import clientGUI as cgui
 from pynput.mouse import Controller as MouseController
+import ctypes
+
 
 HOST = '10.100.102.32'
 PORT = 4444
 pyautogui.FAILSAFE=False
+
+def get_taskbar_height():
+    # Define the RECT structure
+    class RECT(ctypes.Structure):
+        _fields_ = [
+            ("left", ctypes.c_long),
+            ("top", ctypes.c_long),
+            ("right", ctypes.c_long),
+            ("bottom", ctypes.c_long)
+        ]
+
+    # Get the handle to the taskbar window
+    hwnd = ctypes.windll.user32.FindWindowW("Shell_TrayWnd", None)
+
+    # Get the dimensions of the taskbar window
+    rect = RECT()
+    ctypes.windll.user32.GetWindowRect(hwnd, ctypes.byref(rect))
+
+    # Calculate the height of the taskbar
+    taskbar_height = rect.bottom - rect.top
+
+    return taskbar_height
 
 
 def get_your_screen_resolution():
@@ -31,7 +55,8 @@ def receive_screen(HOST,PORT, client_socket):
     data= client_socket.recv(1024).decode().split(",")
     print(data)
     width_server, height_server=int(data[0]), int(data[1])
-    sender = ScreenShareClient(HOST, PORT-1, width_server,height_server)
+    taskbar_height = get_taskbar_height()
+    sender = ScreenShareClient(HOST, PORT-1, width_server,height_server-taskbar_height)
 
     sender.start_stream()
     print("receiving screen")
