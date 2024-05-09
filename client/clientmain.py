@@ -6,6 +6,7 @@ import pyautogui
 from screeninfo import get_monitors
 import time
 import clientGUI as cgui
+from pynput.mouse import Controller as MouseController
 
 HOST = '10.100.102.32'
 PORT = 4444
@@ -48,6 +49,10 @@ def receive_screen(HOST,PORT, client_socket):
         pressed=int(str(xy[2]))
         # print(x,y)
         pyautogui.moveTo(x,y)
+        # Function to simulate mouse scrolling
+        def scroll(steps):
+            mouse = MouseController()
+            mouse.scroll(0, steps)
         if not bool(pressed):
             pass
         elif pressed==1:
@@ -69,10 +74,10 @@ def receive_screen(HOST,PORT, client_socket):
             print(f"{key} pressed")
             if key=='up':
                 print("scroll up")
-                # pyautogui.scroll(10)
+                # scroll(1)  # Scroll up
             elif key=='down':
                 print("scroll down")
-                # pyautogui.scroll(-10)
+                # scroll(-1)  # Scroll down
         client_socket.send("second".encode())
     sender.stop_stream()
 
