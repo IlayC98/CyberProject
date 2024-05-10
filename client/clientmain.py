@@ -140,8 +140,12 @@ def connect_server():
                 print('close flag=false ')
                 break
             app_details = cgui.login_screen()
+            print(app_details)
             #check if the server logged in or not
             check = login_check(client_socket, app_details)
+            print(app_details)
+            if len(app_details.split(":"))==3: break
+
             if check == "exit":
                 cgui.bye()
                 break

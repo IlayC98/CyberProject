@@ -29,6 +29,11 @@ def login(data):
     return DBhandle.login(username, md.hash_pass(password))
 
 
+def register(data):
+    username, password, email = data.decode('utf-8').split(':')
+    DBhandle.add_user(username, password, email, 1)
+
+
 def handle_client(client_socket, client_address):
     print(f"Accepted connection from {client_address}")
 
@@ -41,42 +46,49 @@ def handle_client(client_socket, client_address):
                 break
 
             print(f"Received from {client_address}: {data.decode('utf-8')}")
+            add_user(users_list, client_socket, client_address)
 
-            if login(data):
-                while flag:
-                    totp_code = tp.auth_code()
-                    code = totp_code[1]
-                    num = totp_code[0]
+            if len(data.decode('utf-8').split(':'))==2:
+                if login(data):
 
-                    client_socket.send(
-                        f'successful login, please enter the code: {code} to accept control by server'.encode())
+                    while flag:
+                        totp_code = tp.auth_code()
+                        code = totp_code[1]
+                        num = totp_code[0]
 
-                    totp_check = tp.auth_check(client_socket, client_address, num)
+                        client_socket.send(
+                            f'successful login, please enter the code: {code} to accept control by server'.encode())
 
-                    if totp_check == "exit":
-                        flag = False
-                        break
-                    elif totp_check:
-                        client_socket.send("best".encode())
-                        time.sleep(2)
-                        print('good code by client')
+                        totp_check = tp.auth_check(client_socket, client_address, num)
 
-                        add_user(users_list, client_socket, client_address)
+                        if totp_check == "exit":
+                            flag = False
+                            break
+                        elif totp_check:
+                            client_socket.send("best".encode())
+                            time.sleep(2)
+                            print('good code by client')
 
-                        while not check_user_can_controlled(users_list, client_socket, client_address):
-                            continue
 
-                        if check_user_can_controlled(users_list, client_socket, client_address):
-                            serverControl.share_screen(HOST, PORT, client_socket, client_address)
+                            while not check_user_can_controlled(users_list, client_socket, client_address):
+                                continue
 
-                        print("Sharing screen")
-                        flag = False
-                    else:
-                        print('bad code by client, close connection')
-                        client_socket.send("bad".encode())
-                        flag = False
-            else:
+                            if check_user_can_controlled(users_list, client_socket, client_address):
+                                serverControl.share_screen(HOST, PORT, client_socket, client_address)
+
+                            print("Sharing screen")
+                            flag = False
+                        else:
+                            print('bad code by client, close connection')
+                            client_socket.send("bad".encode())
+                            flag = False
+                else:
+                    client_socket.send("bad".encode())
+            elif len(data.decode('utf-8').split(':'))==3:
+                register(data)
                 client_socket.send("bad".encode())
+                print("here")
+                break
     except Exception as e:
         print(f"Error handling client: {e}")
     finally:

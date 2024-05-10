@@ -45,6 +45,62 @@ def auth_encrypt_screen(client_socket, message):
 
 
 def login_screen():
+    returning_message_to_server=[]
+
+    def register_screen(app, returning_message_to_server):
+        app.destroy()
+
+        def register(x):
+            new_username = entry_text_new_user.get()
+            new_password = entry_text_new_pass.get()
+            new_email = entry_text_email.get()
+
+            # Here you can implement your registration logic
+            # For example, you might want to store the new user information in a database
+
+            # For demonstration purposes, let's print the new user information
+            print("New Username:", new_username)
+            print("New Password:", new_password)
+            print("Email:", new_email)
+
+            message=f'{new_username}:{new_password}:{new_email}'
+            x.append(message)
+
+            register_window.destroy()
+
+        register_window = tk.Tk()
+        register_window.title("Register")
+        register_window.geometry("300x350")
+        register_window.resizable(False, False)
+
+        label_register = tk.Label(register_window, text="Register", font=('Arial Bold', 20))
+        label_register.pack()
+
+        label_new_user = tk.Label(register_window, text="New Username:")
+        label_new_user.pack()
+        entry_text_new_user = tk.StringVar()
+        entry_new_user = tk.Entry(register_window, width=20, textvariable=entry_text_new_user)
+        entry_new_user.pack()
+
+        label_new_pass = tk.Label(register_window, text="New Password:")
+        label_new_pass.pack()
+        entry_text_new_pass = tk.StringVar()
+        entry_new_pass = tk.Entry(register_window, width=20, textvariable=entry_text_new_pass, show='*')
+        entry_new_pass.pack()
+
+        label_email = tk.Label(register_window, text="Email:")
+        label_email.pack()
+        entry_text_email = tk.StringVar()
+        entry_email = tk.Entry(register_window, width=20, textvariable=entry_text_email)
+        entry_email.pack()
+
+        register_button = tk.Button(register_window, text='Register', command=lambda: register(returning_message_to_server))
+        register_button.pack()
+
+        register_window.mainloop()
+
+
+
     app = tk.Tk()
     app.title("Remote RUN")
     app.geometry("500x500")
@@ -68,22 +124,28 @@ def login_screen():
     entry_pass = tk.Entry(app, width=20, textvariable=entry_text_pass, show='*')
     entry_pass.grid(column=1, row=4, padx=10, pady=5)
 
-    def login():
+    def login(x):
         username, password = entry_text_user.get(), entry_text_pass.get()
         message = f'{username}:{password}'
         app.destroy()  # Destroy the window after login
-        return message
+        x.append(message)
 
-    appbtn = tk.Button(app, text='login', command=login)
+    appbtn = tk.Button(app, text='login', command=lambda: login(returning_message_to_server))
     appbtn.grid(column=1, row=5)
+
+    register_button = tk.Button(app, text='Register', command=lambda: register_screen(app, returning_message_to_server))
+    register_button.grid(column=1, row=6)
 
     app.mainloop()
 
-    username, password = entry_text_user.get(), entry_text_pass.get()
-    message = f'{username}:{password}'
+    return returning_message_to_server[0]
 
-    # This line is executed after the mainloop exits
-    return message  # Return the username and password
+
+    # username, password = entry_text_user.get(), entry_text_pass.get()
+    # message = f'{username}:{password}'
+    #
+    # # This line is executed after the mainloop exits
+    # return message  # Return the username and password
 
 
 
