@@ -100,19 +100,21 @@ def share_screen(HOST, PORT, client_socket, client_address):
     host.start_server()
 
     data = client_socket.recv(1024).decode().split(",")
-    width_client, height_client = int(data[0]), int(data[1])
+    width_client, height_client = float(data[0]), float(data[1])
     print(width_client, height_client)
     print(width, height)
     ratio_width = width_client / width
-    ratio_height = height_client / height
+    ratio_height = (height_client) / (height-taskbar_height)
 
 
     while True:
         try:
             currentMouseX, currentMouseY = pyautogui.position()
-            mouse_x = int(currentMouseX * ratio_width)
-            mouse_y = int(currentMouseY * ratio_height) - 20
+            mouse_x = float(currentMouseX * ratio_width)
+            mouse_y = float(currentMouseY * ratio_height)
 
+            if mouse_y< height_client/2: mouse_y-=17
+            else: mouse_y+=15
             def on_scroll(x, y, dx, dy):
                 if dy > 0:
                     print('Mouse scrolled up')
@@ -129,6 +131,7 @@ def share_screen(HOST, PORT, client_socket, client_address):
                 listener.stop()
 
             for i in keyboard_keys:
+
                 if keyboard.is_pressed(i):
                     client_socket.send(f'{mouse_x},{mouse_y},3,{i}'.encode())
                     print(f"Sent {i}")
