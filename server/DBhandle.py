@@ -57,6 +57,41 @@ def username_exists(username):
     conn.close()
     return result > 0
 
+def connected(username):
+    # Check if the user exists
+    if not username_exists(username):
+        print(f"Error: Username '{username}' does not exist.")
+        return
+
+    # Connect to the database
+    conn = sqlite3.connect("user_database.db")
+    cursor = conn.cursor()
+
+    # Update the connection status of the user
+    cursor.execute("UPDATE users SET is_connected=? WHERE username=?", (1, username))
+
+    # Commit changes and close the connection
+    conn.commit()
+    conn.close()
+
+def disconnected(username):
+    # Check if the user exists
+    if not username_exists(username):
+        print(f"Error: Username '{username}' does not exist.")
+        return
+
+    # Connect to the database
+    conn = sqlite3.connect("user_database.db")
+    cursor = conn.cursor()
+
+    # Update the connection status of the user
+    cursor.execute("UPDATE users SET is_connected=? WHERE username=?", (0, username))
+
+    # Commit changes and close the connection
+    conn.commit()
+    conn.close()
+
+
 def add_user(username, password, email, is_connected):
     # Check if the username already exists
     if username_exists(username):
@@ -74,6 +109,21 @@ def add_user(username, password, email, is_connected):
     # Commit changes and close the connection
     conn.commit()
     conn.close()
+
+def get_email_by_username(username):
+    # Connect to the database
+    conn = sqlite3.connect("user_database.db")
+    cursor = conn.cursor()
+
+    # Query the email for the given username
+    cursor.execute("SELECT email FROM users WHERE username=?", (username,))
+    email = cursor.fetchone()
+
+    # Close the database connection
+    conn.close()
+
+    # If the user exists, return their email, otherwise return None
+    return email[0] if email else None
 
 
 def login(username, password):
@@ -95,3 +145,9 @@ if __name__ == "__main__":
     createDB()
     add_user("i", "l", "il@example.com", 1)
     showDB()
+    print(username_exists("Moshe"))
+    connected("Moshe")
+    showDB()
+    disconnected("Moshe")
+    showDB()
+    print(get_email_by_username("Moshe"))  # Output: moshe@example.com

@@ -172,6 +172,7 @@ def connect_server():
 
             else:
                 cgui.incorrect_details()
+                break
 
     except Exception as e:
         error_message = f"Error connecting to the server: {e}"

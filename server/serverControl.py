@@ -114,7 +114,7 @@ def share_screen(HOST, PORT, client_socket, client_address):
             mouse_y = float(currentMouseY * ratio_height)
 
             if mouse_y< height_client/2: mouse_y-=17
-            else: mouse_y+=15
+            else: mouse_y+=2
             def on_scroll(x, y, dx, dy):
                 if dy > 0:
                     print('Mouse scrolled up')

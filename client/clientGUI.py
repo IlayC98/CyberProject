@@ -180,7 +180,7 @@ def login_screen():
 
 def bye():
     root = tk.Tk()
-    root.geometry("200x100")
+    root.geometry("300x300")
 
     label = tk.Label(root, text="bye bye")
     label.pack(pady=20)
@@ -192,7 +192,7 @@ def bye():
 
 def incorrect_details():
     root = tk.Tk()
-    root.geometry("300x100")
+    root.geometry("300x300")
 
     error_label = tk.Label(root, text="Incorrect username or password, please try again")
     error_label.pack(pady=20)

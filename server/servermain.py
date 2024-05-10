@@ -12,6 +12,22 @@ PORT = 4444
 users_list = []
 
 
+def send_email_to_client(data, code):
+    username=data.decode("utf-8").split(":")[0]
+    DBhandle.get_email_by_username(username)
+
+
+
+def connected_client(data):
+    username, password = data.decode('utf-8').split(':')
+    DBhandle.connected(username)
+
+
+def disconnect_client(data):
+    username= data.decode('utf-8').split(':')[0]
+    DBhandle.disconnected(username)
+
+
 def add_user(users_list, client_socket, client_address):
     users_list.append((client_socket, client_address))
 
@@ -50,11 +66,13 @@ def handle_client(client_socket, client_address):
 
             if len(data.decode('utf-8').split(':'))==2:
                 if login(data):
-
+                    connected_client(data)
+                    DBhandle.showDB()
                     while flag:
                         totp_code = tp.auth_code()
                         code = totp_code[1]
                         num = totp_code[0]
+                        print(num+"  gvs  "+code)
 
                         client_socket.send(
                             f'successful login, please enter the code: {code} to accept control by server'.encode())
@@ -84,6 +102,7 @@ def handle_client(client_socket, client_address):
                             flag = False
                 else:
                     client_socket.send("bad".encode())
+                    break
             elif len(data.decode('utf-8').split(':'))==3:
                 register(data)
                 client_socket.send("bad".encode())
@@ -95,6 +114,10 @@ def handle_client(client_socket, client_address):
         print(f"Connection from {client_address} closed.")
         client_socket.close()
         remove_user(users_list, client_socket, client_address)
+        disconnect_client(data)
+        DBhandle.showDB()
+
+
 
 
 def start_server():
