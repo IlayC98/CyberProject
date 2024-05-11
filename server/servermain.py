@@ -93,6 +93,7 @@ def handle_client(client_socket, client_address):
 
             print(f"Received from {client_address}: {data.decode('utf-8')}")
             add_user(users_list, client_socket, client_address)
+            print(users_list)
 
             if len(data.decode('utf-8').split(':'))==2:
                 if login(data):

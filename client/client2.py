@@ -1,23 +1,111 @@
 import socket
 from vidstream import ScreenShareClient
-import threading
+import tkinter as tk
+from tkinter import ttk
+import pyautogui
+from screeninfo import get_monitors
+import time
+import clientGUI as cgui
+from pynput.mouse import Controller as MouseController
+import ctypes
 
-HOST = '127.0.0.1'
+
+HOST = '10.100.102.32'
 PORT = 4444
+pyautogui.FAILSAFE=False
+
+def get_taskbar_height():
+    # Define the RECT structure
+    class RECT(ctypes.Structure):
+        _fields_ = [
+            ("left", ctypes.c_long),
+            ("top", ctypes.c_long),
+            ("right", ctypes.c_long),
+            ("bottom", ctypes.c_long)
+        ]
+
+    # Get the handle to the taskbar window
+    hwnd = ctypes.windll.user32.FindWindowW("Shell_TrayWnd", None)
+
+    # Get the dimensions of the taskbar window
+    rect = RECT()
+    ctypes.windll.user32.GetWindowRect(hwnd, ctypes.byref(rect))
+
+    # Calculate the height of the taskbar
+    taskbar_height = rect.bottom - rect.top
+
+    return taskbar_height
 
 
-def receive_screen(HOST,PORT):
+def get_your_screen_resolution():
+    # Get the screen resolution of the primary monitor
+    monitors = get_monitors()
+
+    if monitors:
+        primary_monitor = monitors[0]
+        width = primary_monitor.width
+        height = primary_monitor.height
+        return width, height
+    else:
+        # Default values if no monitors are found
+        return 1920, 1080  # Update with your default values
+
+def receive_screen(HOST,PORT, client_socket):
     print(f'got in')
-    sender = ScreenShareClient(HOST, PORT-1)
+    data= client_socket.recv(1024).decode().split(",")
+    print(data)
+    width_server, height_server=int(data[0]), int(data[1])
+    taskbar_height = get_taskbar_height()
+    sender = ScreenShareClient(HOST, PORT-1, width_server,height_server-taskbar_height)
 
     sender.start_stream()
+    print("receiving screen")
 
+    width, height=get_your_screen_resolution()[0],get_your_screen_resolution()[1]
+    client_socket.send(f'{width},{height},1'.encode())
 
-def login():
-    username = input('enter username')
-    password = input('enter password')
-    message = f'{username}:{password}'
-    return message
+    time.sleep(5)
+
+    while True:
+        xy1=client_socket.recv(1024).decode()
+        # print(xy1)
+        xy=xy1.split(",")
+        x,y=float(xy[0]),float(xy[1])
+        # print(y)
+        pressed=int(str(xy[2]))
+        # print(x,y)
+        pyautogui.moveTo(x,y)
+        # Function to simulate mouse scrolling
+        def scroll(steps):
+            mouse = MouseController()
+            mouse.scroll(0, steps)
+        if not bool(pressed):
+            pass
+        elif pressed==1:
+            print("got left pressed")
+        #     pyautogui.click(x,y)
+        elif pressed==2:
+            print("got right pressed")
+        #     pyautogui.click(x,y, button='right')
+        elif pressed==3:
+            print(xy)
+            key=str(xy[3])
+            print(f"{key} pressed")
+            # pyautogui.press(key)
+            if key=='q':
+                break
+        elif pressed==4:
+            print(xy)
+            key=str(xy[3])
+            print(f"{key} pressed")
+            if key=='up':
+                print("scroll up")
+                # scroll(1)  # Scroll up
+            elif key=='down':
+                print("scroll down")
+                # scroll(-1)  # Scroll down
+        client_socket.send("second".encode())
+    sender.stop_stream()
 
 
 def login_check(client_socket, data):
@@ -32,26 +120,18 @@ def login_check(client_socket, data):
     return echoed_message
 
 
-def auth_encrypt(client_socket):
-    message = input("Enter the code (or 'exit' to quit): ")
-
-    if message.lower() == 'exit' or not message:
-        return 'exit'
-
-    # Send the message to the server
-    client_socket.send(message.encode('utf-8'))
-    server_code_message = client_socket.recv(1024).decode('utf-8')
-    print(f'the server sent {server_code_message}')
-    return server_code_message
-
-
 def connect_server():
     # Create a client socket
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    print("1")
     server_address = (HOST, PORT)
+    print("2")
     try:
-        # Connect to the server
+        # waiting_screen = cgui.show_waiting_screen(client_socket, server_address)
         client_socket.connect(server_address)
+        # Connect to the server
+        print("connected")
+        # pyautogui.moveTo(100, 150)
 
         flag = True
 
@@ -59,10 +139,15 @@ def connect_server():
             if not flag:
                 print('close flag=false ')
                 break
-            details = login()
-            # check if server logged client in or not
-            check = login_check(client_socket, details)
+            app_details = cgui.login_screen()
+            print(app_details)
+            #check if the server logged in or not
+            check = login_check(client_socket, app_details)
+            print(app_details)
+            if len(app_details.split(":"))==3: break
+
             if check == "exit":
+                cgui.bye()
                 break
             elif check != "bad":
                 print(f"Server echoed: {check}")
@@ -70,31 +155,32 @@ def connect_server():
                     if not flag:
                         break
                     # check if the client code sent was right for the server
-                    totp_code = auth_encrypt(client_socket)
+                    totp_code = cgui.auth_encrypt_screen(client_socket, check)
                     print('got message')
                     if totp_code == "exit":
                         flag = False
                         break
                     elif totp_code != "bad":
                         print("waiting for control")
-                        receive_screen(HOST,PORT)
-                        print("receiving screen")
-                        while input("")!='STOP':
-                            continue
-                        flag=False
+                        #while client_socket.recv().decode('utf8') != 'now can join': client_socket.send("ok".encode())
+                        receive_screen(HOST,PORT,client_socket)
+                        print("out")
+                        flag = False
                     else:
                         print('Incorrect number, closing connection')
                         flag=False
 
             else:
-                print('Incorrect username or password, please try again')
+                cgui.incorrect_details()
+                break
 
     except Exception as e:
-        print(f"Error connecting to the server: {e}")
+        error_message = f"Error connecting to the server: {e}"
+        cgui.show_error_message(error_message)
 
     finally:
         # Close the connection
-        print('Closing connection')
+        cgui.show_end_message("Closing connection")
         client_socket.close()
 
 

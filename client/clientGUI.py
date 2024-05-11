@@ -3,9 +3,17 @@ from tkinter import ttk
 
 
 def auth_encrypt_screen(client_socket, message):
-    def auth_encrypt():
+    returning_message_to_server=[]
+
+    def logout(app, returning_message):
+        app.destroy()
+        returning_message.append('exit')
+
+
+    def auth_encrypt(x):
         message = entry_text.get()
         if message.lower() == 'exit' or not message:
+            print(message)
             return 'exit'
 
         # Send the message to the server
@@ -13,6 +21,7 @@ def auth_encrypt_screen(client_socket, message):
         server_code_message = client_socket.recv(1024).decode('utf-8')
         response_label.config(text=f'The server sent: {server_code_message}')
         app.destroy()  # Destroy the window after login
+        x.append(server_code_message)
         return server_code_message
 
     app = tk.Tk()
@@ -34,14 +43,17 @@ def auth_encrypt_screen(client_socket, message):
     response_label = tk.Label(app, text='', font=('Arial', 12))
     response_label.grid(column=0, row=3, padx=10, pady=5)
 
-    x = auth_encrypt
-    appbtn = tk.Button(app, text='continue', command=x)
+    # x = auth_encrypt
+    appbtn = tk.Button(app, text='continue', command=lambda: auth_encrypt(returning_message_to_server))
     appbtn.grid(column=0, row=4)
+
+    exitbtn = tk.Button(app, text='logout', command=lambda: logout(app, returning_message_to_server))
+    exitbtn.grid(column=0, row=5)
 
     app.mainloop()
 
     # This line is executed after the mainloop exits
-    return x
+    return returning_message_to_server[0]
 
 
 def login_screen():
