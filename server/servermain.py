@@ -5,6 +5,7 @@ import TOTPencrypt as tp
 import threading
 import time
 import serverControl
+import smtplib
 
 HOST = "10.100.102.32"
 PORT = 4444
@@ -14,7 +15,36 @@ users_list = []
 
 def send_email_to_client(data, code):
     username=data.decode("utf-8").split(":")[0]
-    DBhandle.get_email_by_username(username)
+    receiver_email=DBhandle.get_email_by_username(username)
+    # Set up SMTP server details
+    smtp_server = "smtp.gmail.com"
+    smtp_port = 587  # For Gmail
+    smtp_username = 'test10098ilay@gmail.com'
+    smtp_password = "gefa qrfn fjmp agae"
+
+    # Create the email message
+    from_address = smtp_username
+    to_address = receiver_email
+    subject = "code verification for control"
+    body = f"successful login, please enter the code: {code} to accept control by server"
+
+    # Combine the email message parts
+    message = f"From: {from_address}\r\n"
+    message += f"To: {to_address}\r\n"
+    message += f"Subject: {subject}\r\n\n"
+    message += body
+
+    # Create a secure SMTP connection
+    server = smtplib.SMTP(smtp_server, smtp_port)
+    server.starttls()
+    server.login(smtp_username, smtp_password)
+
+    # Send the email
+    server.sendmail(from_address, to_address, message)
+
+    # Close the SMTP connection
+    server.quit()
+    print("Email sent successfully!")
 
 
 
@@ -74,8 +104,9 @@ def handle_client(client_socket, client_address):
                         num = totp_code[0]
                         print(num+"  gvs  "+code)
 
+                        send_email_to_client(data, code)
                         client_socket.send(
-                            f'successful login, please enter the code: {code} to accept control by server'.encode())
+                            f'successful login, please enter the code sent to your email to accept control by server'.encode())
 
                         totp_check = tp.auth_check(client_socket, client_address, num)
 

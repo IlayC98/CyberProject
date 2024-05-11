@@ -17,7 +17,7 @@ def auth_encrypt_screen(client_socket, message):
 
     app = tk.Tk()
     app.title("Authentication")
-    app.geometry("1100x600")
+    app.geometry("1300x800")
     app.resizable(False, False)
 
     label1 = tk.Label(app, text=message, font=('Arial Bold', 14))
@@ -102,7 +102,7 @@ def login_screen():
 
 
     app = tk.Tk()
-    app.title("Remote RUN")
+    app.title("welcome")
     app.geometry("500x500")
     app.resizable(False, False)
 
