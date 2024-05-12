@@ -72,7 +72,7 @@ def receive_screen(HOST,PORT, client_socket):
         xy=xy1.split(",")
         x,y=float(xy[0]),float(xy[1])
         # print(y)
-        pressed=int(str(xy[2]))
+        pressed=float(str(xy[2]))
         # print(x,y)
         pyautogui.moveTo(x,y)
         # Function to simulate mouse scrolling

@@ -204,9 +204,9 @@ def bye():
 
 def incorrect_details():
     root = tk.Tk()
-    root.geometry("300x300")
+    root.geometry("500x300")
 
-    error_label = tk.Label(root, text="Incorrect username or password, please try again")
+    error_label = tk.Label(root, text="Incorrect details or user already logged")
     error_label.pack(pady=20)
 
     # Schedule the window to close after 3000 milliseconds (3 seconds)
@@ -217,7 +217,7 @@ def incorrect_details():
 
 def show_error_message(error_message):
     root = tk.Tk()
-    root.geometry("400x100")
+    root.geometry("1100x300")
 
     error_label = tk.Label(root, text=error_message)
     error_label.pack(pady=20)

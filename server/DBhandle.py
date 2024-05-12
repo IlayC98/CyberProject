@@ -125,6 +125,26 @@ def get_email_by_username(username):
     # If the user exists, return their email, otherwise return None
     return email[0] if email else None
 
+def is_user_connected(username):
+    # Connect to the database
+    conn = sqlite3.connect("user_database.db")
+    cursor = conn.cursor()
+
+    # Check if the user exists
+    if not username_exists(username):
+        print(f"Error: Username '{username}' does not exist.")
+        conn.close()
+        return None
+
+    # Query the connection status of the user
+    cursor.execute("SELECT is_connected FROM users WHERE username=?", (username,))
+    is_connected = cursor.fetchone()[0]
+
+    # Close the database connection
+    conn.close()
+
+    return is_connected
+
 
 def login(username, password):
     # Connect to the database
@@ -146,8 +166,10 @@ if __name__ == "__main__":
     add_user("i", "l", "il@example.com", 1)
     showDB()
     print(username_exists("Moshe"))
-    connected("Moshe")
-    showDB()
     disconnected("Moshe")
     showDB()
+    disconnected("o")
+    disconnected("David")
+    showDB()
     print(get_email_by_username("Moshe"))  # Output: moshe@example.com
+    print(not is_user_connected("Moshe"))  # Output: True
