@@ -66,7 +66,7 @@ def receive_screen(HOST, PORT, client_socket):
         y = dec.decrypt_number(int(y))
         pressed = float(str(xy[2]))
         pressed = dec.decrypt_number(int(pressed))
-        print(x, y)
+        # print(x, y)
         pyautogui.moveTo(x, y)
 
         def scroll(steps):
