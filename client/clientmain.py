@@ -5,7 +5,7 @@ from tkinter import ttk
 import pyautogui
 from screeninfo import get_monitors
 import time
-import clientGUI as cgui
+from clientGUI import AuthApp as cgui
 from pynput.mouse import Controller as MouseController
 import ctypes
 from server import encoding_sharing as dec
@@ -162,7 +162,7 @@ def connect_server():
                     if not flag:
                         break
                     # check if the client code sent was right for the server
-                    totp_code = cgui.auth_encrypt_screen(client_socket, check)
+                    totp_code = cgui.auth_encrypt_screen(check)
                     print('got message')
                     if totp_code == "exit":
                         flag = False
