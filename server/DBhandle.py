@@ -167,6 +167,7 @@ if __name__ == "__main__":
     showDB()
     print(username_exists("Moshe"))
     disconnected("Moshe")
+    disconnected("i")
     showDB()
     disconnected("o")
     disconnected("David")

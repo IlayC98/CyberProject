@@ -8,6 +8,7 @@ import time
 import clientGUI as cgui
 from pynput.mouse import Controller as MouseController
 import ctypes
+from server import encoding_sharing as dec
 
 
 HOST = '10.100.102.32'
@@ -71,8 +72,11 @@ def receive_screen(HOST,PORT, client_socket):
         # print(xy1)
         xy=xy1.split(",")
         x,y=float(xy[0]),float(xy[1])
+        x= dec.decrypt_number(x)
+        y= dec.decrypt_number(y)
         # print(y)
         pressed=float(str(xy[2]))
+        pressed=dec.decrypt_number(pressed)
         # print(x,y)
         pyautogui.moveTo(x,y)
         # Function to simulate mouse scrolling
@@ -90,6 +94,7 @@ def receive_screen(HOST,PORT, client_socket):
         elif pressed==3:
             print(xy)
             key=str(xy[3])
+            key=dec.caesar_cipher_decrypt(key)
             print(f"{key} pressed")
             # pyautogui.press(key)
             if key=='q':
@@ -97,6 +102,7 @@ def receive_screen(HOST,PORT, client_socket):
         elif pressed==4:
             print(xy)
             key=str(xy[3])
+            key=dec.caesar_cipher_decrypt(key)
             print(f"{key} pressed")
             if key=='up':
                 print("scroll up")
