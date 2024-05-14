@@ -6,11 +6,28 @@ import threading
 import time
 import serverControl
 import smtplib
+import tkinter as tk
+
 
 HOST = "10.100.102.32"
 PORT = 4444
 
 users_list = []
+
+
+def user_want_control(data):
+    username= data.decode('utf-8').split(':')[0]
+
+    root = tk.Tk()
+    root.geometry("500x300")
+
+    error_label = tk.Label(root, text=f"{username} accepted control")
+    error_label.pack(pady=20)
+
+    # Schedule the window to close after 3000 milliseconds (3 seconds)
+    root.after(300, root.destroy)
+
+    root.mainloop()
 
 
 def send_email_to_client(data, code):
@@ -137,6 +154,7 @@ def handle_client(client_socket, client_address):
                                 continue
 
                             if check_user_can_controlled(users_list, data):
+                                # user_want_control(data)
                                 serverControl.share_screen(HOST, PORT, client_socket, client_address)
 
                             print("Sharing screen")

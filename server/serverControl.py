@@ -116,16 +116,16 @@ def share_screen(HOST, PORT, client_socket, client_address):
             if mouse_y< height_client/2: mouse_y-=17
             else: mouse_y+=2
 
-            encoding_x = enc.encrypted_number(mouse_x)
-            encoding_y = enc.encrypted_number(mouse_y)
+            encoding_x = enc.encrypt_number(int(mouse_x))
+            encoding_y = enc.encrypt_number(int(mouse_y))
             def on_scroll(x, y, dx, dy):
                 if dy > 0:
                     print('Mouse scrolled up')
-                    client_socket.send(f'{encoding_x},{encoding_y},{enc.encrypted_number(4)},{enc.caesar_cipher_encrypt("up")}'.encode())
+                    client_socket.send(f'{encoding_x},{encoding_y},{enc.encrypt_number(4)},{enc.caesar_cipher_encrypt("up")}'.encode())
 
                 elif dy < 0:
                     print('Mouse scrolled down')
-                    client_socket.send(f'{encoding_x},{encoding_y},{enc.encrypted_number(4)},{enc.caesar_cipher_encrypt("down")}'.encode())
+                    client_socket.send(f'{encoding_x},{encoding_y},{enc.encrypt_number(4)},{enc.caesar_cipher_encrypt("down")}'.encode())
 
             with mouse.Listener(on_scroll=on_scroll) as listener:
                 # Wait for 2 seconds
@@ -136,18 +136,18 @@ def share_screen(HOST, PORT, client_socket, client_address):
             for i in keyboard_keys:
 
                 if keyboard.is_pressed(i):
-                    client_socket.send(f'{encoding_x},{encoding_y},{enc.encrypted_number(3)},{enc.caesar_cipher_encrypt(i)}'.encode())
+                    client_socket.send(f'{encoding_x},{encoding_y},{enc.encrypt_number(3)},{enc.caesar_cipher_encrypt(i)}'.encode())
                     print(f"Sent {i}")
 
             if left_button_pressed(mouse_keys[0]):
                 print("Left click")
-                client_socket.send(f'{encoding_x},{encoding_y},{enc.encrypted_number(1)}'.encode())
+                client_socket.send(f'{encoding_x},{encoding_y},{enc.encrypt_number(1)}'.encode())
                 print("Sent True")
             elif right_button_pressed(mouse_keys[1]):
                 print("Right click")
-                client_socket.send(f'{encoding_x},{encoding_y},{enc.encrypted_number(2)}'.encode())
+                client_socket.send(f'{encoding_x},{encoding_y},{enc.encrypt_number(2)}'.encode())
             else:
-                client_socket.send(f'{encoding_x},{encoding_y},{enc.encrypted_number(0)}'.encode())
+                client_socket.send(f'{encoding_x},{encoding_y},{enc.encrypt_number(0)}'.encode())
 
             res = client_socket.recv(1024).decode()
 

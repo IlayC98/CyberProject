@@ -66,19 +66,19 @@ def receive_screen(HOST,PORT, client_socket):
     width, height=get_your_screen_resolution()[0],get_your_screen_resolution()[1]
     client_socket.send(f'{width},{height},1'.encode())
 
-    time.sleep(5)
+    time.sleep(7)
 
     while True:
         xy1=client_socket.recv(1024).decode()
         # print(xy1)
         xy=xy1.split(",")
         x,y=float(xy[0]),float(xy[1])
-        x= dec.decrypt_number(x)
-        y= dec.decrypt_number(y)
+        x= dec.decrypt_number(int(x))
+        y= dec.decrypt_number(int(y))
         # print(y)
         pressed=float(str(xy[2]))
-        pressed=dec.decrypt_number(pressed)
-        # print(x,y)
+        pressed=dec.decrypt_number(int(pressed))
+        print(x,y)
         pyautogui.moveTo(x,y)
         # Function to simulate mouse scrolling
         def scroll(steps):
