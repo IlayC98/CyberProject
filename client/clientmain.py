@@ -5,12 +5,14 @@ from screeninfo import get_monitors
 import time
 from pynput.mouse import Controller as MouseController
 import ctypes
-from server import encoding_sharing as dec
+from server import encoding_sharing
 from clientGUI import AuthApp  # Ensure this matches the filename where the class is defined
 
 HOST = '10.100.102.32'
 PORT = 4444
 pyautogui.FAILSAFE = False
+
+dec = encoding_sharing.EncryptionManager()
 
 
 def get_taskbar_height():

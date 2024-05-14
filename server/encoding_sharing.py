@@ -1,15 +1,39 @@
-def encrypt_number(number, key=7, modulus=1000000000):
-    return (number * key) % modulus
+class EncryptionManager:
+    def __init__(self, key=7, shift=3, modulus=1000000000):
+        self.key = key
+        self.shift = shift
+        self.modulus = modulus
+        self.key_inverse = pow(key, -1, modulus)
 
-def decrypt_number(encrypted_number, key_inverse=pow(7, -1, 1000000000), modulus=1000000000):
-    return (encrypted_number * key_inverse) % modulus
+    def encrypt_number(self, number):
+        return (number * self.key) % self.modulus
 
-def caesar_cipher_encrypt(text, shift=3):
-    encrypted_text = ""
-    if isinstance(text, str):
-        for char in text:
+    def decrypt_number(self, encrypted_number):
+        return (encrypted_number * self.key_inverse) % self.modulus
+
+    def caesar_cipher_encrypt(self, text):
+        encrypted_text = ""
+        if isinstance(text, str):
+            for char in text:
+                if char.isalpha():
+                    shifted = ord(char) + self.shift
+                    if char.islower():
+                        if shifted > ord('z'):
+                            shifted -= 26
+                        elif shifted < ord('a'):
+                            shifted += 26
+                    elif char.isupper():
+                        if shifted > ord('Z'):
+                            shifted -= 26
+                        elif shifted < ord('A'):
+                            shifted += 26
+                    encrypted_text += chr(shifted)
+                else:
+                    encrypted_text += char
+        elif isinstance(text, int):
+            char = chr(text)
             if char.isalpha():
-                shifted = ord(char) + shift
+                shifted = ord(char) + self.shift
                 if char.islower():
                     if shifted > ord('z'):
                         shifted -= 26
@@ -20,66 +44,73 @@ def caesar_cipher_encrypt(text, shift=3):
                         shifted -= 26
                     elif shifted < ord('A'):
                         shifted += 26
-                encrypted_text += chr(shifted)
+                encrypted_text = chr(shifted)
             else:
-                encrypted_text += char
-    elif isinstance(text, int):
-        char = chr(text)
-        if char.isalpha():
-            shifted = ord(char) + shift
-            if char.islower():
-                if shifted > ord('z'):
-                    shifted -= 26
-                elif shifted < ord('a'):
-                    shifted += 26
-            elif char.isupper():
-                if shifted > ord('Z'):
-                    shifted -= 26
-                elif shifted < ord('A'):
-                    shifted += 26
-            encrypted_text = chr(shifted)
-        else:
-            encrypted_text = char
-    return encrypted_text
+                encrypted_text = char
+        return encrypted_text
 
-def caesar_cipher_decrypt(text, shift=3):
-    return caesar_cipher_encrypt(text, -shift)
+    def caesar_cipher_decrypt(self, text):
+        decrypted_text = ""
+        if isinstance(text, str):
+            for char in text:
+                if char.isalpha():
+                    shifted = ord(char) - self.shift
+                    if char.islower():
+                        if shifted > ord('z'):
+                            shifted -= 26
+                        elif shifted < ord('a'):
+                            shifted += 26
+                    elif char.isupper():
+                        if shifted > ord('Z'):
+                            shifted -= 26
+                        elif shifted < ord('A'):
+                            shifted += 26
+                    decrypted_text += chr(shifted)
+                else:
+                    decrypted_text += char
+        elif isinstance(text, int):
+            char = chr(text)
+            if char.isalpha():
+                shifted = ord(char) - self.shift
+                if char.islower():
+                    if shifted > ord('z'):
+                        shifted -= 26
+                    elif shifted < ord('a'):
+                        shifted += 26
+                elif char.isupper():
+                    if shifted > ord('Z'):
+                        shifted -= 26
+                    elif shifted < ord('A'):
+                        shifted += 26
+                decrypted_text = chr(shifted)
+            else:
+                decrypted_text = char
+        return decrypted_text
+
 
 # Example usage:
+encryption_manager = EncryptionManager()
+
+# Encrypt and decrypt string using Caesar cipher
 input_text = "up"
-shift = 3
+encrypted_text = encryption_manager.caesar_cipher_encrypt(input_text)
+decrypted_text = encryption_manager.caesar_cipher_decrypt(encrypted_text)
 
-# Encrypt string
-encrypted_text = caesar_cipher_encrypt(input_text, shift)
 print("Encrypted String:", encrypted_text)
-
-
-# Encrypt character
-char = ord('a')  # ASCII code for character 'A'
-encrypted_char = caesar_cipher_encrypt(char, shift)
-print("Encrypted Char:", encrypted_char)
-
-# Decrypt string
-decrypted_text = caesar_cipher_decrypt(encrypted_text, shift)
 print("Decrypted String:", decrypted_text)
 
-# Decrypt character
-decrypted_char = caesar_cipher_decrypt(encrypted_char, shift)
+# Encrypt and decrypt character using Caesar cipher
+char = ord('a')  # ASCII code for character 'a'
+encrypted_char = encryption_manager.caesar_cipher_encrypt(char)
+decrypted_char = encryption_manager.caesar_cipher_decrypt(encrypted_char)
+
+print("Encrypted Char:", encrypted_char)
 print("Decrypted Char:", decrypted_char)
 
-
-# Example usage:
+# Encrypt and decrypt number
 number = 950
-key = 7
-modulus = 1000000000  # Modulus should be a large prime number for better security
-encrypted_number = encrypt_number(number, key, modulus)
-print("Encrypted Number:", encrypted_number)
+encrypted_number = encryption_manager.encrypt_number(number)
+decrypted_number = encryption_manager.decrypt_number(encrypted_number)
 
-# Decrypt the encrypted number
-# To decrypt, you need the inverse of the key modulo the modulus
-# For simplicity, we're assuming the key is relatively prime to the modulus
-key_inverse = pow(key, -1, modulus)
-decrypted_number = decrypt_number(encrypted_number, key_inverse, modulus)
+print("Encrypted Number:", encrypted_number)
 print("Decrypted Number:", decrypted_number)
-#
-#
