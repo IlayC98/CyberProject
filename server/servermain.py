@@ -64,45 +64,45 @@ def send_email_to_client(data, code):
     print("Email sent successfully!")
 
 
-def user_connected(data):
-    username= data.decode('utf-8').split(':')[0]
-    return DBhandle.is_user_connected(username)
+class UserHandler:
+    def __init__(self, users_list):
+        self.users_list = users_list
+
+    def user_connected(self, data):
+        username = data.decode('utf-8').split(':')[0]
+        return DBhandle.is_user_connected(username)
+
+    def connected_client(self, data):
+        username, password = data.decode('utf-8').split(':')
+        DBhandle.connected(username)
+
+    def disconnect_client(self, data):
+        username = data.decode('utf-8').split(':')[0]
+        DBhandle.disconnected(username)
+
+    def add_user(self, data):
+        username = data.decode('utf-8').split(':')[0]
+        self.users_list.append(username)
+
+    def check_user_can_controlled(self, data):
+        username = data.decode('utf-8').split(':')[0]
+        return self.users_list and self.users_list[0] == username
+
+    def remove_user(self, data):
+        username = data.decode('utf-8').split(':')[0]
+        if username in self.users_list:
+            self.users_list.remove(username)
+
+    def login(self, data):
+        username, password = data.decode('utf-8').split(':')
+        return DBhandle.login(username, md.hash_pass(password))
+
+    def register(self, data):
+        username, password, email = data.decode('utf-8').split(':')
+        DBhandle.add_user(username, password, email, 1)
 
 
-
-def connected_client(data):
-    username, password = data.decode('utf-8').split(':')
-    DBhandle.connected(username)
-
-
-def disconnect_client(data):
-    username= data.decode('utf-8').split(':')[0]
-    DBhandle.disconnected(username)
-
-
-def add_user(users_list, data):
-    username= data.decode('utf-8').split(':')[0]
-    users_list.append((username))
-
-
-def check_user_can_controlled(users_list, data):
-    username= data.decode('utf-8').split(':')[0]
-    return users_list and users_list[0] == (username)
-
-
-def remove_user(users_list, data):
-    username= data.decode('utf-8').split(':')[0]
-    users_list.remove((username))
-
-
-def login(data):
-    username, password = data.decode('utf-8').split(':')
-    return DBhandle.login(username, md.hash_pass(password))
-
-
-def register(data):
-    username, password, email = data.decode('utf-8').split(':')
-    DBhandle.add_user(username, password, email, 1)
+handle_user=UserHandler(users_list)
 
 
 def handle_client(client_socket, client_address):
@@ -117,8 +117,8 @@ def handle_client(client_socket, client_address):
                 break
 
             print(f"Received from {client_address}: {data.decode('utf-8')}")
-            if not user_connected(data):
-                add_user(users_list, data)
+            if not handle_user.user_connected(data):
+                handle_user.add_user(data)
             else:
                 print("user already connected")
                 client_socket.send("bad".encode())
@@ -126,8 +126,8 @@ def handle_client(client_socket, client_address):
             print(users_list)
 
             if len(data.decode('utf-8').split(':'))==2:
-                if login(data):
-                    connected_client(data)
+                if handle_user.login(data):
+                    handle_user.connected_client(data)
                     DBhandle.showDB()
                     while flag:
                         totp_code = tp.auth_code()
@@ -150,10 +150,10 @@ def handle_client(client_socket, client_address):
                             print('good code by client')
 
 
-                            while not check_user_can_controlled(users_list, data):
+                            while not handle_user.check_user_can_controlled(data):
                                 continue
 
-                            if check_user_can_controlled(users_list, data):
+                            if handle_user.check_user_can_controlled(data):
                                 # user_want_control(data)
                                 serverControl.share_screen(HOST, PORT, client_socket, client_address)
 
@@ -167,7 +167,7 @@ def handle_client(client_socket, client_address):
                     client_socket.send("bad".encode())
                     break
             elif len(data.decode('utf-8').split(':'))==3:
-                register(data)
+                handle_user.register(data)
                 client_socket.send("bad".encode())
                 print("here")
                 break
@@ -176,8 +176,8 @@ def handle_client(client_socket, client_address):
     finally:
         print(f"Connection from {client_address} closed.")
         client_socket.close()
-        remove_user(users_list, data)
-        disconnect_client(data)
+        handle_user.remove_user(data)
+        handle_user.disconnect_client(data)
         DBhandle.showDB()
 
 
