@@ -53,6 +53,7 @@ def caesar_cipher_decrypt(text, shift=3):
 # encrypted_text = caesar_cipher_encrypt(input_text, shift)
 # print("Encrypted String:", encrypted_text)
 #
+# 
 # # Encrypt character
 # char = ord('a')  # ASCII code for character 'A'
 # encrypted_char = caesar_cipher_encrypt(char, shift)

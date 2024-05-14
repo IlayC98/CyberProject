@@ -15,6 +15,7 @@ HOST = '10.100.102.32'
 PORT = 4444
 pyautogui.FAILSAFE=False
 
+
 def get_taskbar_height():
     # Define the RECT structure
     class RECT(ctypes.Structure):

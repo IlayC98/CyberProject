@@ -24,7 +24,6 @@ keyboard_keys = (
 )
 
 
-
 def left_button_pressed(state_left):
     a = win32api.GetKeyState(0x01)
     left_button_got_pressed = False
