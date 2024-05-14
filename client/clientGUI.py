@@ -1,30 +1,28 @@
 import tkinter as tk
-
+from tkinter import ttk
 
 class AuthApp:
     def __init__(self, client_socket):
         self.client_socket = client_socket
-        self.returning_message_to_server = []
 
     def auth_encrypt_screen(self, message):
-        self.returning_message_to_server = []
+        returning_message_to_server = []
 
-        def logout():
+        def logout(app, returning_message):
             app.destroy()
-            self.returning_message_to_server.append('exit')
+            returning_message.append('exit')
 
-        def auth_encrypt():
+        def auth_encrypt(x):
             message = entry_text.get()
             if message.lower() == 'exit' or not message:
                 print(message)
                 return 'exit'
 
-            # Send the message to the server
             self.client_socket.send(message.encode('utf-8'))
             server_code_message = self.client_socket.recv(1024).decode('utf-8')
             response_label.config(text=f'The server sent: {server_code_message}')
-            app.destroy()  # Destroy the window after login
-            self.returning_message_to_server.append(server_code_message)
+            app.destroy()
+            x.append(server_code_message)
             return server_code_message
 
         app = tk.Tk()
@@ -46,36 +44,30 @@ class AuthApp:
         response_label = tk.Label(app, text='', font=('Arial', 12))
         response_label.grid(column=0, row=3, padx=10, pady=5)
 
-        appbtn = tk.Button(app, text='continue', command=auth_encrypt)
+        appbtn = tk.Button(app, text='continue', command=lambda: auth_encrypt(returning_message_to_server))
         appbtn.grid(column=0, row=4)
 
-        exitbtn = tk.Button(app, text='logout', command=logout)
+        exitbtn = tk.Button(app, text='logout', command=lambda: logout(app, returning_message_to_server))
         exitbtn.grid(column=0, row=5)
 
         app.mainloop()
 
-        return self.returning_message_to_server[0]
+        return returning_message_to_server[0]
 
     def login_screen(self):
-        self.returning_message_to_server = []
+        returning_message_to_server = []
 
-        def register_screen():
+        def register_screen(app, returning_message_to_server):
             app.destroy()
 
-            def register():
+            def register(x):
                 new_username = entry_text_new_user.get()
                 new_password = entry_text_new_pass.get()
                 new_email = entry_text_email.get()
 
-                # Here you can implement your registration logic
-                # For example, you might want to store the new user information in a database
-
-                print("New Username:", new_username)
-                print("New Password:", new_password)
-                print("Email:", new_email)
-
                 message = f'{new_username}:{new_password}:{new_email}'
-                self.returning_message_to_server.append(message)
+                x.append(message)
+
                 register_window.destroy()
 
             register_window = tk.Tk()
@@ -104,13 +96,13 @@ class AuthApp:
             entry_email = tk.Entry(register_window, width=20, textvariable=entry_text_email)
             entry_email.pack()
 
-            register_button = tk.Button(register_window, text='Register', command=register)
+            register_button = tk.Button(register_window, text='Register', command=lambda: register(returning_message_to_server))
             register_button.pack()
 
             register_window.mainloop()
 
         app = tk.Tk()
-        app.title("Welcome")
+        app.title("welcome")
         app.geometry("500x500")
         app.resizable(False, False)
 
@@ -132,24 +124,23 @@ class AuthApp:
         entry_pass = tk.Entry(app, width=20, textvariable=entry_text_pass, show='*')
         entry_pass.grid(column=1, row=4, padx=10, pady=5)
 
-        def login():
+        def login(x):
             username, password = entry_text_user.get(), entry_text_pass.get()
             message = f'{username}:{password}'
-            app.destroy()  # Destroy the window after login
-            self.returning_message_to_server.append(message)
+            app.destroy()
+            x.append(message)
 
-        appbtn = tk.Button(app, text='login', command=login)
+        appbtn = tk.Button(app, text='login', command=lambda: login(returning_message_to_server))
         appbtn.grid(column=1, row=5)
 
-        register_button = tk.Button(app, text='Register', command=register_screen)
+        register_button = tk.Button(app, text='Register', command=lambda: register_screen(app, returning_message_to_server))
         register_button.grid(column=1, row=6)
 
         app.mainloop()
 
-        return self.returning_message_to_server[0]
+        return returning_message_to_server[0]
 
-    @staticmethod
-    def bye():
+    def bye(self):
         root = tk.Tk()
         root.geometry("300x300")
 
@@ -157,10 +148,10 @@ class AuthApp:
         label.pack(pady=20)
 
         root.after(3000, root.destroy)
+
         root.mainloop()
 
-    @staticmethod
-    def incorrect_details():
+    def incorrect_details(self):
         root = tk.Tk()
         root.geometry("500x300")
 
@@ -168,10 +159,10 @@ class AuthApp:
         error_label.pack(pady=20)
 
         root.after(3000, root.destroy)
+
         root.mainloop()
 
-    @staticmethod
-    def show_error_message(error_message):
+    def show_error_message(self, error_message):
         root = tk.Tk()
         root.geometry("1100x300")
 
@@ -179,10 +170,10 @@ class AuthApp:
         error_label.pack(pady=20)
 
         root.after(5000, root.destroy)
+
         root.mainloop()
 
-    @staticmethod
-    def show_end_message(message):
+    def show_end_message(self, message):
         root = tk.Tk()
         root.geometry("300x100")
 
@@ -190,4 +181,5 @@ class AuthApp:
         label.pack(pady=20)
 
         root.after(3000, root.destroy)
+
         root.mainloop()
