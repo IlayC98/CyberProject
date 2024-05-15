@@ -80,7 +80,7 @@ def receive_screen(HOST,PORT, client_socket):
         # print(y)
         pressed=float(str(xy[2]))
         pressed=dec.decrypt_number(int(pressed))
-        print(x,y)
+        # print(x,y)
         pyautogui.moveTo(x,y)
         # Function to simulate mouse scrolling
         def scroll(steps):

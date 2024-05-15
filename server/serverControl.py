@@ -6,7 +6,9 @@ import keyboard
 import time
 from pynput import mouse
 import ctypes
-from encoding_sharing import EncryptionManager as enc
+from encoding_sharing import EncryptionManager
+
+enc= EncryptionManager()
 
 
 mouse_keys = [win32api.GetKeyState(0x01), win32api.GetKeyState(0x02)]
