@@ -217,7 +217,7 @@ def incorrect_details():
     root = tk.Tk()
     root.geometry("500x300")
 
-    error_label = tk.Label(root, text="Incorrect details or user already logged. if you just registered, so the registration worked well")
+    error_label = tk.Label(root, text="Incorrect details or user already logged")
     error_label.pack(pady=20)
 
     # Schedule the window to close after 3000 milliseconds (3 seconds)

@@ -164,8 +164,11 @@ def handle_client(client_socket, client_address):
                             break
                         elif totp_check:
                             client_socket.send("best".encode())
-                            time.sleep(2)
+                            # time.sleep(2)
                             print('good code by client')
+                            client_socket.recv(1024)
+                            client_socket.send(f"client".encode())
+
 
                             while not len(handle_admin.users_list):
                                 continue
@@ -173,8 +176,7 @@ def handle_client(client_socket, client_address):
                             print("admin can control")
                             handle_admin.remove_user(handle_admin.users_list[0])
                             print("now control")
-                            client_socket.recv()
-                            client_socket.send(f"client".encode())
+
                             # if handle_user.check_user_can_controlled(data):
                             #     # user_want_control(data)
                             #     serverControl.share_screen(HOST, PORT, client_socket, client_address)
@@ -218,7 +220,10 @@ def handle_client(client_socket, client_address):
                             client_socket.send("best".encode())
                             time.sleep(2)
                             print('good code by admin')
-                            client_socket.recv()
+                            # client_socket.recv()
+
+                            while not len(handle_user.users_list):
+                                continue
 
                             first_client=handle_user.remove_user(handle_user.users_list[0])
                             client_socket.send(f"{HOST},{PORT},{first_client[0]},{first_client[1]}")
