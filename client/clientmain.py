@@ -9,6 +9,7 @@ import clientGUI as cgui
 from pynput.mouse import Controller as MouseController
 import ctypes
 from server import encoding_sharing
+# from server import serverControl
 
 dec=encoding_sharing.EncryptionManager()
 
@@ -171,8 +172,14 @@ def connect_server():
                         break
                     elif totp_code != "bad":
                         print("waiting for control")
+                        client_socket.send(f"who am I? {client_socket}".encode("utf8"))
                         #while client_socket.recv().decode('utf8') != 'now can join': client_socket.send("ok".encode())
-                        receive_screen(HOST,PORT,client_socket)
+                        res=client_socket.recv().decode()
+                        if res=="client":
+                            receive_screen(HOST,PORT,client_socket)
+                        else:
+                            res1=res.split(",")
+                            serverControl.share_screen(res1[0],res1[1],res1[2],res1[3])
                         print("out")
                         flag = False
                     else:

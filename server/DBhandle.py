@@ -177,6 +177,25 @@ def get_role_by_username(username):
     # If the user exists, return their role, otherwise return None
     return role[0] if role else None
 
+def update_role(username, new_role):
+    # Check if the user exists
+    if not username_exists(username):
+        print(f"Error: Username '{username}' does not exist.")
+        return
+
+    # Connect to the database
+    conn = sqlite3.connect("user_database.db")
+    cursor = conn.cursor()
+
+    # Update the role of the user
+    cursor.execute("UPDATE users SET role=? WHERE username=?", (new_role, username))
+
+    # Commit changes and close the connection
+    conn.commit()
+    conn.close()
+
+    print(f"Role of user '{username}' has been updated to '{new_role}'.")
+
 
 if __name__ == "__main__":
     createDB()
@@ -194,3 +213,5 @@ if __name__ == "__main__":
     print(get_role_by_username("David"))  # Output: admin
     print(get_role_by_username("Moshe"))  # Output: client
     print(get_role_by_username("NonexistentUser"))  # Output: None
+    print(get_role_by_username("i"))
+    print(get_role_by_username("o"))

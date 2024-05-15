@@ -92,14 +92,28 @@ class UserHandler:
         username = data.decode('utf-8').split(':')[0]
         if username in self.users_list:
             self.users_list.remove(username)
+        return username
 
     def login(self, data):
         username, password = data.decode('utf-8').split(':')
         return DBhandle.login(username, md.hash_pass(password))
 
     def register(self, data):
-        username, password, email = data.decode('utf-8').split(':')
-        DBhandle.add_user(username, password, email, 0)
+        username, password, email, role = data.decode('utf-8').split(':')
+        DBhandle.add_user(username, password, email, 0, role)
+
+    def get_user_role(self, data):
+        username = data.decode('utf-8').split(':')[0]
+        return DBhandle.get_role_by_username(username)
+
+    def add_client(self, client_socket, client_address):
+        self.users_list.append((client_socket, client_address))
+
+    # def check_client_can_controlled(self, client_socket, client_address):
+    #     return users_list and users_list[0] == (client_socket, client_address)
+
+    def remove_client(self, client_socket, client_address):
+        self.users_list.remove((client_socket, client_address))
 
 
 handle_user=UserHandler(users_list)
@@ -111,22 +125,25 @@ def handle_client(client_socket, client_address):
 
     try:
         flag = True
-        while flag:
-            data = client_socket.recv(1024)
-            if not data:
-                print('No data received, closing connection')
-                break
+        data = client_socket.recv(1024)
+        # while flag:
 
-            print(f"Received from {client_address}: {data.decode('utf-8')}")
+        if not data:
+            print('No data received, closing connection')
+            # break
 
-            if len(data.decode('utf-8').split(':'))==2:
+        print(f"Received from {client_address}: {data.decode('utf-8')}")
+        print(data.decode('utf-8').split(':'))
+
+        if len(data.decode('utf-8').split(':'))==2:
+            if handle_user.get_user_role(data)=="client":
                 if not handle_user.user_connected(data):
-                    handle_user.add_user(data)
+                    handle_user.add_client(client_socket,client_address)
                 else:
                     print("user already connected")
                     client_socket.send("bad".encode())
-                    break
-                print(users_list)
+                    # break
+                print(handle_user.users_list)
                 if handle_user.login(data):
                     handle_user.connected_client(data)
                     DBhandle.showDB()
@@ -150,13 +167,17 @@ def handle_client(client_socket, client_address):
                             time.sleep(2)
                             print('good code by client')
 
-
-                            while not handle_user.check_user_can_controlled(data):
+                            while not len(handle_admin.users_list):
                                 continue
 
-                            if handle_user.check_user_can_controlled(data):
-                                # user_want_control(data)
-                                serverControl.share_screen(HOST, PORT, client_socket, client_address)
+                            print("admin can control")
+                            handle_admin.remove_user(handle_admin.users_list[0])
+                            print("now control")
+                            client_socket.recv()
+                            client_socket.send(f"client".encode())
+                            # if handle_user.check_user_can_controlled(data):
+                            #     # user_want_control(data)
+                            #     serverControl.share_screen(HOST, PORT, client_socket, client_address)
 
                             print("Sharing screen")
                             flag = False
@@ -166,18 +187,65 @@ def handle_client(client_socket, client_address):
                             flag = False
                 else:
                     client_socket.send("bad".encode())
-                    break
-            elif len(data.decode('utf-8').split(':'))==3:
-                handle_user.register(data)
-                client_socket.send("bad".encode())
-                print("here")
-                break
+                    # break
+            if handle_admin.get_user_role(data) == "admin":
+                if not handle_admin.user_connected(data):
+                    handle_admin.add_user(data)
+                else:
+                    print("admin already connected")
+                    client_socket.send("bad".encode())
+                    # break
+                print(handle_admin.users_list)
+                if handle_admin.login(data):
+                    handle_admin.connected_client(data)
+                    DBhandle.showDB()
+                    while flag:
+                        totp_code = tp.auth_code()
+                        code = totp_code[1]
+                        num = totp_code[0]
+                        print(num + "  gvs  " + code)
+
+                        send_email_to_client(data, code)
+                        client_socket.send(
+                            f'successful login, please enter the code sent to your email to accept control by server'.encode())
+
+                        totp_check = tp.auth_check(client_socket, client_address, num)
+
+                        if totp_check == "exit":
+                            flag = False
+                            break
+                        elif totp_check:
+                            client_socket.send("best".encode())
+                            time.sleep(2)
+                            print('good code by admin')
+                            client_socket.recv()
+
+                            first_client=handle_user.remove_user(handle_user.users_list[0])
+                            client_socket.send(f"{HOST},{PORT},{first_client[0]},{first_client[1]}")
+
+                            print("Sharing screen")
+                            flag = False
+                        else:
+                            print('bad code by admin, close connection')
+                            client_socket.send("bad".encode())
+                            flag = False
+                else:
+                    client_socket.send("bad".encode())
+                    # break
+        elif len(data.decode('utf-8').split(':'))==4:
+            handle_user.register(data)
+            client_socket.send("bad".encode())
+            print("here")
+            # break
     except Exception as e:
         print(f"Error handling client: {e}")
     finally:
         print(f"Connection from {client_address} closed.")
         client_socket.close()
-        handle_user.remove_user(data)
+        if handle_user.get_user_role(data) == "client":
+            handle_user.remove_client(client_socket,client_address)
+        else:
+            handle_admin.remove_user(data)
         handle_user.disconnect_client(data)
         DBhandle.showDB()
 
