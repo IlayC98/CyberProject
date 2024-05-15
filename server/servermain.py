@@ -13,7 +13,7 @@ HOST = "10.100.102.32"
 PORT = 4444
 
 users_list = []
-
+admins_list = []
 
 def user_want_control(data):
     username= data.decode('utf-8').split(':')[0]
@@ -99,10 +99,11 @@ class UserHandler:
 
     def register(self, data):
         username, password, email = data.decode('utf-8').split(':')
-        DBhandle.add_user(username, password, email, 1)
+        DBhandle.add_user(username, password, email, 0)
 
 
 handle_user=UserHandler(users_list)
+handle_admin=UserHandler(admins_list)
 
 
 def handle_client(client_socket, client_address):
@@ -117,15 +118,15 @@ def handle_client(client_socket, client_address):
                 break
 
             print(f"Received from {client_address}: {data.decode('utf-8')}")
-            if not handle_user.user_connected(data):
-                handle_user.add_user(users_list, data)
-            else:
-                print("user already connected")
-                client_socket.send("bad".encode())
-                break
-            print(users_list)
 
             if len(data.decode('utf-8').split(':'))==2:
+                if not handle_user.user_connected(data):
+                    handle_user.add_user(data)
+                else:
+                    print("user already connected")
+                    client_socket.send("bad".encode())
+                    break
+                print(users_list)
                 if handle_user.login(data):
                     handle_user.connected_client(data)
                     DBhandle.showDB()
