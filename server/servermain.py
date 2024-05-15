@@ -174,7 +174,8 @@ def handle_client(client_socket, client_address):
                                 continue
 
                             print("admin can control")
-                            handle_admin.remove_user(handle_admin.users_list[0])
+                            x=handle_admin.remove_user(handle_admin.users_list[0])
+                            client_socket.send('x'.encode())
                             print("now control")
 
                             # if handle_user.check_user_can_controlled(data):

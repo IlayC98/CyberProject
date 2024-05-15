@@ -11,11 +11,13 @@ import ctypes
 from server import encoding_sharing
 # from server import serverControl
 import control
+from vidstream import StreamingServer
+
 
 dec=encoding_sharing.EncryptionManager()
 
 
-HOST = '10.100.102.32'
+HOST = '10.100.102.71'
 PORT = 4444
 pyautogui.FAILSAFE=False
 
@@ -174,13 +176,23 @@ def connect_server():
                     elif totp_code != "bad":
                         print("waiting for control")
                         client_socket.send(f"who am I? {client_socket}".encode("utf8"))
+                        print("sent")
                         #while client_socket.recv().decode('utf8') != 'now can join': client_socket.send("ok".encode())
                         res=client_socket.recv(1024).decode()
-                        if res=="client":
-                            receive_screen(HOST,PORT,client_socket)
+                        print(res)
+
+                        if str(res)==str("client"):
+                            res1=float(client_socket.recv(1024).decode())
+                            # receive_screen(res1,PORT,client_socket)
+                            sender = ScreenShareClient(res1, PORT - 1)
+
+                            sender.start_stream()
+                            print("receiving screen")
                         else:
-                            res1=res.split(",")
-                            control.share_screen(res1[0],res1[1],res1[2],res1[3])
+                            # res1=res.split(",")
+                            # control.share_screen(res[0],res[1],res[2],res[3])
+                            host = StreamingServer(HOST, PORT - 1)
+                            host.start_server()
                         print("out")
                         flag = False
                     else:
