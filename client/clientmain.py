@@ -9,15 +9,11 @@ import clientGUI as cgui
 from pynput.mouse import Controller as MouseController
 import ctypes
 from server import encoding_sharing
-# from server import serverControl
-import control
-from vidstream import StreamingServer
-
 
 dec=encoding_sharing.EncryptionManager()
 
 
-HOST = '10.100.102.71'
+HOST = '10.100.102.32'
 PORT = 4444
 pyautogui.FAILSAFE=False
 
@@ -94,16 +90,16 @@ def receive_screen(HOST,PORT, client_socket):
             pass
         elif pressed==1:
             print("got left pressed")
-        #     pyautogui.click(x,y)
+            pyautogui.click(x,y)
         elif pressed==2:
             print("got right pressed")
-        #     pyautogui.click(x,y, button='right')
+            pyautogui.click(x,y, button='right')
         elif pressed==3:
             print(xy)
             key=str(xy[3])
             key=dec.caesar_cipher_decrypt(key)
             print(f"{key} pressed")
-            # pyautogui.press(key)
+            pyautogui.press(key)
             if key=='q':
                 break
         elif pressed==4:
@@ -113,10 +109,10 @@ def receive_screen(HOST,PORT, client_socket):
             print(f"{key} pressed")
             if key=='up':
                 print("scroll up")
-                # scroll(1)  # Scroll up
+                scroll(1)  # Scroll up
             elif key=='down':
                 print("scroll down")
-                # scroll(-1)  # Scroll down
+                scroll(-1)  # Scroll down
         client_socket.send("second".encode())
     sender.stop_stream()
 
@@ -175,24 +171,8 @@ def connect_server():
                         break
                     elif totp_code != "bad":
                         print("waiting for control")
-                        client_socket.send(f"who am I? {client_socket}".encode("utf8"))
-                        print("sent")
                         #while client_socket.recv().decode('utf8') != 'now can join': client_socket.send("ok".encode())
-                        res=client_socket.recv(1024).decode()
-                        print(res)
-
-                        if str(res)==str("client"):
-                            res1=float(client_socket.recv(1024).decode())
-                            # receive_screen(res1,PORT,client_socket)
-                            sender = ScreenShareClient(res1, PORT - 1)
-
-                            sender.start_stream()
-                            print("receiving screen")
-                        else:
-                            # res1=res.split(",")
-                            # control.share_screen(res[0],res[1],res[2],res[3])
-                            host = StreamingServer(HOST, PORT - 1)
-                            host.start_server()
+                        receive_screen(HOST,PORT,client_socket)
                         print("out")
                         flag = False
                     else:

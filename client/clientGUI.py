@@ -57,7 +57,7 @@ def auth_encrypt_screen(client_socket, message):
 
 
 def login_screen():
-    returning_message_to_server = []
+    returning_message_to_server=[]
 
     def register_screen(app, returning_message_to_server):
         app.destroy()
@@ -66,7 +66,6 @@ def login_screen():
             new_username = entry_text_new_user.get()
             new_password = entry_text_new_pass.get()
             new_email = entry_text_email.get()
-            role = role_var.get()
 
             # Here you can implement your registration logic
             # For example, you might want to store the new user information in a database
@@ -75,16 +74,15 @@ def login_screen():
             print("New Username:", new_username)
             print("New Password:", new_password)
             print("Email:", new_email)
-            print("Role:", role)
 
-            message = f'{new_username}:{new_password}:{new_email}:{role}'
+            message=f'{new_username}:{new_password}:{new_email}'
             x.append(message)
 
             register_window.destroy()
 
         register_window = tk.Tk()
         register_window.title("Register")
-        register_window.geometry("300x400")
+        register_window.geometry("300x350")
         register_window.resizable(False, False)
 
         label_register = tk.Label(register_window, text="Register", font=('Arial Bold', 20))
@@ -108,18 +106,12 @@ def login_screen():
         entry_email = tk.Entry(register_window, width=20, textvariable=entry_text_email)
         entry_email.pack()
 
-        label_role = tk.Label(register_window, text="Role:")
-        label_role.pack()
-        role_var = tk.StringVar(value="client")
-        role_admin = tk.Radiobutton(register_window, text="Admin", variable=role_var, value="admin")
-        role_client = tk.Radiobutton(register_window, text="Client", variable=role_var, value="client")
-        role_admin.pack()
-        role_client.pack()
-
         register_button = tk.Button(register_window, text='Register', command=lambda: register(returning_message_to_server))
         register_button.pack()
 
         register_window.mainloop()
+
+
 
     app = tk.Tk()
     app.title("welcome")
@@ -159,9 +151,6 @@ def login_screen():
     app.mainloop()
 
     return returning_message_to_server[0]
-
-
-
 
 
     # username, password = entry_text_user.get(), entry_text_pass.get()

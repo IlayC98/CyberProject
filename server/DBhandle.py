@@ -7,15 +7,14 @@ def createDB():
     conn = sqlite3.connect("user_database.db")
     cursor = conn.cursor()
 
-    # Create a table to store usernames, passwords, emails, connection status, and roles if it doesn't exist
+    # Create a table to store usernames, passwords, emails, and connection status if it doesn't exist
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY,
             username TEXT NOT NULL,
             password TEXT NOT NULL,
             email TEXT NOT NULL,
-            is_connected BOOLEAN NOT NULL DEFAULT 0,
-            role TEXT NOT NULL DEFAULT 'client' -- Added role column with default value 'client'
+            is_connected BOOLEAN NOT NULL DEFAULT 0
         )
     """)
 
@@ -25,10 +24,10 @@ def createDB():
 
     # Insert sample data if the table is empty
     if result == 0:
-        cursor.execute("INSERT INTO users (username, password, email, is_connected, role) VALUES (?, ?, ?, ?, ?)",
-                       ("David", md.hash_pass("Lenovo"), "david@example.com", 1, "admin")) # Assigning 'admin' role to David
-        cursor.execute("INSERT INTO users (username, password, email, is_connected, role) VALUES (?, ?, ?, ?, ?)",
-                       ("Moshe", md.hash_pass("Asus"), "moshe@example.com", 0, "client")) # Assigning 'client' role to Moshe
+        cursor.execute("INSERT INTO users (username, password, email, is_connected) VALUES (?, ?, ?, ?)",
+                       ("David", md.hash_pass("Lenovo"), "david@example.com", 1))
+        cursor.execute("INSERT INTO users (username, password, email, is_connected) VALUES (?, ?, ?, ?)",
+                       ("Moshe", md.hash_pass("Asus"), "moshe@example.com", 0))
 
     conn.commit()
     conn.close()
@@ -39,7 +38,7 @@ def showDB():
     cursor = conn.cursor()
 
     # Query all data from the users table
-    query = 'SELECT id, username, SUBSTR(password, 1, 8) AS password, email, is_connected, role FROM users'
+    query = 'SELECT id, username, SUBSTR(password, 1, 8) AS password, email, is_connected FROM users'
     df = pd.read_sql_query(query, conn)
 
     # Display the DataFrame
@@ -93,7 +92,7 @@ def disconnected(username):
     conn.close()
 
 
-def add_user(username, password, email, is_connected, role): # Added role parameter
+def add_user(username, password, email, is_connected):
     # Check if the username already exists
     if username_exists(username):
         print(f"Error: Username '{username}' already exists.")
@@ -104,8 +103,8 @@ def add_user(username, password, email, is_connected, role): # Added role parame
     cursor = conn.cursor()
 
     # Insert a new user into the users table
-    cursor.execute("INSERT INTO users (username, password, email, is_connected, role) VALUES (?, ?, ?, ?, ?)",
-                   (username, md.hash_pass(password), email, is_connected, role))
+    cursor.execute("INSERT INTO users (username, password, email, is_connected) VALUES (?, ?, ?, ?)",
+                   (username, md.hash_pass(password), email, is_connected))
 
     # Commit changes and close the connection
     conn.commit()
@@ -162,44 +161,9 @@ def login(username, password):
     return user
 
 
-def get_role_by_username(username):
-    # Connect to the database
-    conn = sqlite3.connect("user_database.db")
-    cursor = conn.cursor()
-
-    # Query the role for the given username
-    cursor.execute("SELECT role FROM users WHERE username=?", (username,))
-    role = cursor.fetchone()
-
-    # Close the database connection
-    conn.close()
-
-    # If the user exists, return their role, otherwise return None
-    return role[0] if role else None
-
-def update_role(username, new_role):
-    # Check if the user exists
-    if not username_exists(username):
-        print(f"Error: Username '{username}' does not exist.")
-        return
-
-    # Connect to the database
-    conn = sqlite3.connect("user_database.db")
-    cursor = conn.cursor()
-
-    # Update the role of the user
-    cursor.execute("UPDATE users SET role=? WHERE username=?", (new_role, username))
-
-    # Commit changes and close the connection
-    conn.commit()
-    conn.close()
-
-    print(f"Role of user '{username}' has been updated to '{new_role}'.")
-
-
 if __name__ == "__main__":
     createDB()
-    add_user("i", "l", "il@example.com", 1, "client") # Adding a user with 'client' role
+    add_user("i", "l", "il@example.com", 1)
     showDB()
     print(username_exists("Moshe"))
     disconnected("Moshe")
@@ -210,8 +174,3 @@ if __name__ == "__main__":
     showDB()
     print(get_email_by_username("Moshe"))  # Output: moshe@example.com
     print(not is_user_connected("Moshe"))  # Output: True
-    print(get_role_by_username("David"))  # Output: admin
-    print(get_role_by_username("Moshe"))  # Output: client
-    print(get_role_by_username("NonexistentUser"))  # Output: None
-    print(get_role_by_username("i"))
-    print(get_role_by_username("o"))
