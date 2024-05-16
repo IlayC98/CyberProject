@@ -64,7 +64,9 @@ def send_email_to_client(data, code):
 
 
 class UserHandler:
-    def __init__(self, users_list):
+    def __init__(self, users_list=None):
+        if users_list is None:
+            users_list = []
         self.users_list = users_list
 
     def user_connected(self, data):
@@ -199,6 +201,7 @@ def start_server():
 
 
 if __name__ == "__main__":
+    DBhandle.createDB()
     DBhandle.disconnect_all()
     DBhandle.showDB()
     start_server()

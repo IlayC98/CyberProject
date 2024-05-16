@@ -1,7 +1,5 @@
 import socket
 from vidstream import ScreenShareClient
-import tkinter as tk
-from tkinter import ttk
 import pyautogui
 from screeninfo import get_monitors
 import time
