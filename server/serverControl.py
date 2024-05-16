@@ -159,5 +159,3 @@ def share_screen(HOST, PORT, client_socket, client_address):
 
     host.stop_server()
     print("Screen sharing stopped")
-
-# If this code is meant to be part of a larger program, make sure to integrate it properly with your existing codebase.
