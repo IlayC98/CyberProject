@@ -98,7 +98,7 @@ class UserHandler:
 
     def register(self, data):
         username, password, email = data.decode('utf-8').split(':')
-        DBhandle.add_user(username, password, email, 0)
+        return DBhandle.add_user(username, password, email, 0)
 
 
 handle_user=UserHandler(users_list)
@@ -166,10 +166,13 @@ def handle_client(client_socket, client_address):
                     client_socket.send("bad".encode())
                     break
             elif len(data.decode('utf-8').split(':'))==3:
-                handle_user.register(data)
-                client_socket.send("bad".encode())
+                x=handle_user.register(data)
+                if x:
+                    client_socket.send("Registration went successfully".encode())
+
+                else:
+                    client_socket.send("username already exist".encode())
                 print("here")
-                break
     except Exception as e:
         print(f"Error handling client: {e}")
     finally:

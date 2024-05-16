@@ -96,7 +96,7 @@ def add_user(username, password, email, is_connected):
     # Check if the username already exists
     if username_exists(username):
         print(f"Error: Username '{username}' already exists.")
-        return
+        return False
 
     # Connect to the database
     conn = sqlite3.connect("user_database.db")
@@ -109,6 +109,7 @@ def add_user(username, password, email, is_connected):
     # Commit changes and close the connection
     conn.commit()
     conn.close()
+    return True
 
 def get_email_by_username(username):
     # Connect to the database

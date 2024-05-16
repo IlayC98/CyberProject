@@ -153,7 +153,11 @@ def connect_server():
             #check if the server logged in or not
             check = login_check(client_socket, app_details)
             print(app_details)
-            if len(app_details.split(":"))==3: break
+            if len(app_details.split(":"))==3:
+                print(check)
+                cgui.show_error_message(check)
+                continue
+
 
             if check == "exit":
                 cgui.bye()

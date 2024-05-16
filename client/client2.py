@@ -8,11 +8,15 @@ import time
 import clientGUI as cgui
 from pynput.mouse import Controller as MouseController
 import ctypes
+from server import encoding_sharing
+
+dec=encoding_sharing.EncryptionManager()
 
 
 HOST = '10.100.102.32'
 PORT = 4444
 pyautogui.FAILSAFE=False
+
 
 def get_taskbar_height():
     # Define the RECT structure
@@ -64,15 +68,18 @@ def receive_screen(HOST,PORT, client_socket):
     width, height=get_your_screen_resolution()[0],get_your_screen_resolution()[1]
     client_socket.send(f'{width},{height},1'.encode())
 
-    time.sleep(5)
+    time.sleep(7)
 
     while True:
         xy1=client_socket.recv(1024).decode()
         # print(xy1)
         xy=xy1.split(",")
         x,y=float(xy[0]),float(xy[1])
+        x= dec.decrypt_number(int(x))
+        y= dec.decrypt_number(int(y))
         # print(y)
-        pressed=int(str(xy[2]))
+        pressed=float(str(xy[2]))
+        pressed=dec.decrypt_number(int(pressed))
         # print(x,y)
         pyautogui.moveTo(x,y)
         # Function to simulate mouse scrolling
@@ -83,27 +90,29 @@ def receive_screen(HOST,PORT, client_socket):
             pass
         elif pressed==1:
             print("got left pressed")
-        #     pyautogui.click(x,y)
+            pyautogui.click(x,y)
         elif pressed==2:
             print("got right pressed")
-        #     pyautogui.click(x,y, button='right')
+            pyautogui.click(x,y, button='right')
         elif pressed==3:
             print(xy)
             key=str(xy[3])
+            key=dec.caesar_cipher_decrypt(key)
             print(f"{key} pressed")
-            # pyautogui.press(key)
+            pyautogui.press(key)
             if key=='q':
                 break
         elif pressed==4:
             print(xy)
             key=str(xy[3])
+            key=dec.caesar_cipher_decrypt(key)
             print(f"{key} pressed")
             if key=='up':
                 print("scroll up")
-                # scroll(1)  # Scroll up
+                scroll(1)  # Scroll up
             elif key=='down':
                 print("scroll down")
-                # scroll(-1)  # Scroll down
+                scroll(-1)  # Scroll down
         client_socket.send("second".encode())
     sender.stop_stream()
 
@@ -144,7 +153,11 @@ def connect_server():
             #check if the server logged in or not
             check = login_check(client_socket, app_details)
             print(app_details)
-            if len(app_details.split(":"))==3: break
+            if len(app_details.split(":"))==3:
+                print(check)
+                cgui.show_error_message(check)
+                continue
+
 
             if check == "exit":
                 cgui.bye()
