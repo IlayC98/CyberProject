@@ -199,4 +199,6 @@ def start_server():
 
 
 if __name__ == "__main__":
+    DBhandle.disconnect_all()
+    DBhandle.showDB()
     start_server()

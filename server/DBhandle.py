@@ -161,6 +161,18 @@ def login(username, password):
 
     return user
 
+def disconnect_all():
+    # Connect to the database
+    conn = sqlite3.connect("user_database.db")
+    cursor = conn.cursor()
+
+    # Update the connection status of all users
+    cursor.execute("UPDATE users SET is_connected=?", (0,))
+
+    # Commit changes and close the connection
+    conn.commit()
+    conn.close()
+
 
 if __name__ == "__main__":
     createDB()
@@ -168,10 +180,12 @@ if __name__ == "__main__":
     showDB()
     print(username_exists("Moshe"))
     disconnected("Moshe")
-    disconnected("i")
+    connected("i")
     showDB()
     disconnected("o")
     disconnected("David")
+    disconnect_all()
     showDB()
     print(get_email_by_username("Moshe"))  # Output: moshe@example.com
     print(not is_user_connected("Moshe"))  # Output: True
+
